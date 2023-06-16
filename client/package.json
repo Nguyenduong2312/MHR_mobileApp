@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start -c",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"
   },
   "dependencies": {
     "@expo/vector-icons": "^13.0.0",
+    "@react-native-community/async-storage": "^1.12.1",
     "@react-native-community/masked-view": "*",
     "@react-navigation/bottom-tabs": "6.3.1",
     "@react-navigation/drawer": "6.4.1",
@@ -38,6 +39,7 @@
     "react-native-tab-view": "^3.0.0",
     "react-native-vector-icons": "*",
     "react-navigation": "*",
+    "sync-storage": "^0.4.2",
     "tunnel": "^0.0.6"
   },
   "devDependencies": {

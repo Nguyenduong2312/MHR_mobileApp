@@ -1,162 +1,132 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from 'react';
 import {
-  StyleSheet,
   View,
-  TextInput,
-  Text,
   TouchableOpacity,
-} from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
-import Header from "./Header";
+  Text,
+  StyleSheet,
+  ScrollView,
+  Alert,
+} from 'react-native';
+import CustomInput from './CustomInput';
+//import { useNavigation } from '@react-navigation/core';
+import CustomButton from './CustomButton';
 
-import {useForm, Controller} from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
-const Sign = (props) => {
-  const [roleOpen, setRoleOpen] = useState(false);
-  const [roleValue, setRoleValue] = useState(null);
-  const [role, setRole] = useState([
-    { label: "Doctor", value: "doctor" },
-    { label: "Patient", value: "patient" },
-    { label: "Health Organization", value: "healthorganization"}
-  ]);
-  const [loading, setLoading] = useState(false);
-  const onRoleOpen = useCallback(() => {
-    setRoleOpen(false);
-  }, []);
-
-
-  const { handleSubmit, control } = useForm();
-  const onSubmit = (data) => {
-    console.log(data, "data");
-  };
-  return (
-    <View style={styles.container}>
-      <Text style={styles.label}>User Name</Text>
-      <Controller
-        name="user name"
-        defaultValue=""
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <TextInput
-            style={styles.input}
-            selectionColor={"#5188E3"}
-            onChangeText={onChange}
-            value={value}
-          />
-        )}
-      />
-
-      <Text style={styles.label}>Password</Text>
-      <Controller
-        name="password"
-        defaultValue=""
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <TextInput
-            style={styles.input}
-            secureTextEntry={true}
-            selectionColor={"#5188E3"}
-            onChangeText={onChange}
-            value={value}
-          />
-        )}
-      />
-      <View>
+export default function SignUpScreen(props,{navigation}) {
+  const { control, handleSubmit, watch } = useForm();
+  const pwd = watch('password1');
+   const [loading, setLoading] = useState(false);
+  const onRegisterPressed = async (data) => {
+    await fetch('http://192.168.1.30:5000/register', {
+      method: 'POST',
+      headers: {
+       'Content-Type': 'application/json'
+     },
+     body:JSON.stringify(data),
         
+    })
+    .then((response) => {
+      if(response.status === 200){
+        props.navigation.navigate('Edit Profile');
+      }
+      return response.json()
+    })
+    .then((res) => {
+      //setMessage(res.msg||'')
+      console.log(res.msg);
+    })
+    .catch(error => console.log(error))
+  };
+
+  return (
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <View style={styles.root}>
+        <Text style={styles.title}>Create an account</Text>
+
+        <CustomInput
+          name="username"
+          control={control}
+          placeholder="User Name"   placeholderTextColor="#8b9cb5"
+
+          rules={{
+            required: 'Name is required',
+            minLength: {
+              value: 3,
+              message: 'Name should be at least 3 characters long',
+            },
+            maxLength: {
+              value: 24,
+              message: 'Name should be max 24 characters long',
+            },
+          }}
+        />
+        <CustomInput
+          name="password1"
+          control={control}
+          placeholder="Password"
+          placeholderTextColor="#8b9cb5"
+          secureTextEntry
+          rules={{
+            required: 'Password is required',
+            minLength: {
+              value: 8,
+              message: 'Password should be at least 8 characters long',
+            },
+          }}
+        />
+        <CustomInput
+          name="password2"
+          control={control}
+          placeholder="Repeat Password"
+          placeholderTextColor="#8b9cb5"
+          secureTextEntry
+          rules={{
+            validate: (value) => value === pwd || 'Password do not match',
+          }}
+        />
+
+        <CustomButton
+          text="Register"
+          onPress={
+            (() => props.navigation.navigate('Profile'),
+            handleSubmit(onRegisterPressed))
+          }
+        />
+        <TouchableOpacity style={styles.logIn}>
+          <Text
+            style={styles.links}
+            onPress={() => props.navigation.navigate('Login')}>
+            I have an account
+          </Text>
+        </TouchableOpacity>
       </View>
-
-
-      <Text style={styles.label}>Role</Text>
-      <Controller
-        name="role"
-        defaultValue=""
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <View style={styles.dropdownRole}>
-            <DropDownPicker
-              style={styles.dropdown}
-              open={roleOpen}
-              value={roleValue} erValue
-              items={role}
-              setOpen={setRoleOpen}
-              setValue={setRoleValue}
-              setItems={setRole}
-              placeholder="Select Your Role"
-              placeholderStyle={styles.placeholderStyles}
-              onChangeValue={onChange}
-              zIndex={3000}
-              zIndexInverse={1000}
-            />
-          </View>
-        )}
-      />
-   
-      <TouchableOpacity onPress={handleSubmit(onSubmit)}>
-        <Text style={styles.getStarted}>Get Started</Text>
-      </TouchableOpacity>
-
-
-      <TouchableOpacity style={styles.logIn}>
-        <Text style={styles.links} onPress={()=>props.navigation.navigate('Login')}>I have an account</Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#A7C7E7",
+  root: {
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    padding: 20,
   },
-  input: {
-    borderStyle: "solid",
-    borderColor: "#0039a6",
-    borderRadius: 7,
-    borderWidth: 1,
-    fontSize: 15,
-    height: 50,
-    marginHorizontal: 10,
-    paddingStart: 10,
-    marginBottom: 25,
-    backgroundColor: "#ffffff",
+  title: {
+    marginTop: 60,
+    marginBottom: 20,
+    textAlign: 'center',
+    fontSize: 35,
+    color: '#0039a6',
   },
-  label: {
-    marginBottom: 7,
-    marginStart: 10,
-    fontSize:15,
-
-  },
-  placeholderStyles: {
-    color: "grey",
-  },
-
-  dropdownRole: {
-    marginHorizontal: 10,
-    marginBottom: 25,
-  },
-  dropdown: {
-    borderColor:"#0039a6",
-    height: 50,
-  },
-  getStarted: {
-    backgroundColor: "#0039a6",
-    color: "white",
-    textAlign: "center",
-    marginHorizontal: 60,
-    paddingVertical: 15,
-    borderRadius: 50,
-    marginTop: 20,
-  },
-  logIn: {
-    flex: 1,
-    justifyContent: "flex-end",
-    marginBottom: 50,
+  text: {
+    marginTop:20,
+    color: 'gray',
+    marginVertical: 10,
   },
   links: {
-    textAlign: "center",
-    textDecorationLine: "underline",
-    color: "#758580",
+    marginTop: 130,
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+    color: '#758580',
   },
 });
-
-export default Sign;

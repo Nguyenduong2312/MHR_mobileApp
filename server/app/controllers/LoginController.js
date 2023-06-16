@@ -1,34 +1,42 @@
 const Account = require('../models/Account');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: '30d',
+    });
+};
 
 class LoginController {
     // [POST] /login
     login(req, res, next) {
-        console.log('req:', req.body)
-        if (req.username === null) {
-            res.status(400).json({ status: false });
-        } else if (req.password === null) {
-            res.status(400).json({ status: false });
+        console.log('req:', req.body);
+        const { username, password } = req.body;
+        if (!username) {
+            return res.status(220).json({msg: 'Username can be empty.'});
+        } else if (!req.body.password) {
+            return res.status(220).json({msg: 'Password can be empty.'});
         }
-        const { username, password } = req.body; //lấy được username & password
+
         //Xử lý
         Account.findOne({ username: username })
-            .lean()
             .then((account) => {
                 if (!account) {
-                    res.status(400).json({ status: false });
+                    return res.status(220).json({msg: 'Username does not exist.'});
                 } else {
-                    console.log('username', username);
                     bcrypt.compare(
                         password,
                         account.password,
                         function (err, result) {
                             if (result) {
-                                req.session.user = account;
-                                console.log('session: ', req.session.user);
-                                res.status(200).json({ status: true });
+                                return res.status(200).json({
+                                    token: generateToken(account._id),
+                                });
                             } else {
-                                res.status(400).json({ status: false });
+                                return res
+                                    .status(220)
+                                    .json({msg: 'Password is incorrect.'});
                             }
                         },
                     );
@@ -37,33 +45,31 @@ class LoginController {
             .catch(next);
     }
 
-    logout(req, res, next) {
-        // Destroy a session
-        req.session.destroy(function (err) {
-            return res
-                .status(200)
-                .json({
-                    status: 'success',
-                    session: 'cannot access session here',
-                });
+    getUser(req, res) {
+        Account.findOne({ id: req.params.id })
+            .then((account) => {
+                res.json(account);
+            })
+            .catch(() => {
+                res.send('null');
+            });
+    }
+
+    getUserById(req, res) {
+        Account.findOne({ _id: req.params.id })
+            .then((account) => {
+                res.send(account);
+            })
+            .catch(() => {
+                res.send('null');
+            });
+    }
+
+    user(req, res) {
+        Account.findOne({ _id: req.user._id }).then((account) => {
+            res.send(account);
         });
     }
-
-    getUser(req,res){
-        console.log('getusser');
-        Account.findOne({id: req.params.id})
-        .then((account) => {
-            res.send(account)
-        })
-    }
-
-    // [GET] /login/user
-    user(req, res) {
-        Account.findOne({id: req.session.user.id})
-        .then((account) => {
-            res.send(account)
-        })
-}
 }
 
 module.exports = new LoginController();
