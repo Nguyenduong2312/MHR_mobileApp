@@ -16,9 +16,9 @@ import { useForm } from 'react-hook-form';
 export default function SignUpScreen(props,{navigation}) {
   const { control, handleSubmit, watch } = useForm();
   const pwd = watch('password1');
-   const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const onRegisterPressed = async (data) => {
-    await fetch('http://192.168.1.30:5000/register', {
+    await fetch('http://192.168.68.129:5000/register', {
       method: 'POST',
       headers: {
        'Content-Type': 'application/json'

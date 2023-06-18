@@ -40,7 +40,7 @@ export default LoginScreen = (props) => {
   ]);
 
   useEffect(() => {
-    fetch('http://192.168.1.30:5000/account/user', {
+    fetch('http://192.168.68.129:5000/account/user', {
         credentials: 'include',
         method: 'GET',
         headers: {
@@ -75,7 +75,7 @@ export default LoginScreen = (props) => {
       return;
     }
     console.log(data);
-    fetch('http://192.168.1.30:3000/updateAccount', {
+    fetch('http://192.168.68.129:3000/updateAccount', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
