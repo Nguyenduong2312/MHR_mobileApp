@@ -1,24 +1,23 @@
-import React, { useState } from 'react';
 import {
   View,
   TouchableOpacity,
   Text,
   StyleSheet,
   ScrollView,
-  Alert,
 } from 'react-native';
 import CustomInput from './CustomInput';
-//import { useNavigation } from '@react-navigation/core';
 import CustomButton from './CustomButton';
-
 import { useForm } from 'react-hook-form';
 
-export default function SignUpScreen(props,{navigation}) {
+export default function SignUpScreen(props) {
   const { control, handleSubmit, watch } = useForm();
   const pwd = watch('password1');
-  const [loading, setLoading] = useState(false);
+  
   const onRegisterPressed = async (data) => {
-    await fetch('http://192.168.68.129:5000/register', {
+    data.role='patient'
+    console.log(data);
+    props.navigation.navigate('Profile');
+     await fetch('http://192.168.68.129:5000/register', {
       method: 'POST',
       headers: {
        'Content-Type': 'application/json'
@@ -35,10 +34,11 @@ export default function SignUpScreen(props,{navigation}) {
     .then((res) => {
       //setMessage(res.msg||'')
       console.log(res.msg);
+       alert ('There was a problem with the server');
+       return;
     })
     .catch(error => console.log(error))
   };
-
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <View style={styles.root}>
@@ -47,8 +47,8 @@ export default function SignUpScreen(props,{navigation}) {
         <CustomInput
           name="username"
           control={control}
-          placeholder="User Name"   placeholderTextColor="#8b9cb5"
-
+          placeholder="User Name"
+          placeholderTextColor="#8b9cb5"
           rules={{
             required: 'Name is required',
             minLength: {
@@ -88,10 +88,7 @@ export default function SignUpScreen(props,{navigation}) {
 
         <CustomButton
           text="Register"
-          onPress={
-            (() => props.navigation.navigate('Profile'),
-            handleSubmit(onRegisterPressed))
-          }
+          onPress={handleSubmit(onRegisterPressed)}
         />
         <TouchableOpacity style={styles.logIn}>
           <Text
@@ -119,7 +116,7 @@ const styles = StyleSheet.create({
     color: '#0039a6',
   },
   text: {
-    marginTop:20,
+    marginTop: 20,
     color: 'gray',
     marginVertical: 10,
   },
