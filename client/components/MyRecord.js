@@ -55,18 +55,19 @@ export default function Basic() {
     </TouchableHighlight>
   );
   const downloadFromAPI = async (data,rowMap) => {
+    const filename="download";
     closeRow(rowMap,data.item.key);
     const localhost = Platform.OS === "android" ? "10.0.2.2" : "127.0.0.1";
     const result = await FileSystem.downloadAsync(
       http://192.168.1.30:5000/record/download/${data.item._id},//fetch
-      FileSystem.documentDirectory + data.item.Filename,
+      FileSystem.documentDirectory + filename,
       {
         headers: {
           "MyHeader": "MyValue"
         }
       }
     );
-    save(result.uri, data.item.fileName, result.headers["Content-Type"]);
+    save(result.uri, filename, result.headers["Content-Type"]);
   };
 
   const save = async (uri, filename, mimetype) => {
