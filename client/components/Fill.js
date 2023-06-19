@@ -17,8 +17,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import CustomButton from './CustomButton';
-import { getFormatedDate } from 'react-native-modern-datepicker';
-import DatePicker from 'react-native-modern-datepicker';
+//import { getFormatedDate } from 'react-native-modern-datepicker';
+//import DatePicker from 'react-native-modern-datepicker';
 export default LoginScreen = (props) => {
   const { control, handleSubmit } = useForm();
   const [user, setUser] = useState("");
@@ -41,10 +41,10 @@ export default LoginScreen = (props) => {
   const [email, setEmail] = useState(user.email);
   const [address, setAddress] = useState(user.address);
   const today = new Date();
-  const startDate = getFormatedDate(
-    today.setDate(today.getDate() + 1),
-    'DD-MM-YYYY'
-  );
+  //const startDate = getFormatedDate(
+    //today.setDate(today.getDate() + 1),
+    //'DD-MM-YYYY'
+  //);
   const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState(user.date);
   const [startedDate, setStartedDate] = useState('');
@@ -202,34 +202,6 @@ export default LoginScreen = (props) => {
                 </TouchableOpacity>
               </View>
 
-              <Modal
-                animationType="slide"
-                transparent={true}
-                visible={openStartDatePicker}>
-                <View style={styles.centeredView}>
-                  <View style={styles.modalView}>
-                    <DatePicker
-                      mode="calendar"
-                      minimumDate={startDate}
-                      selected={startedDate}
-                      onDateChanged={handleChangeStartDate}
-                      onSelectedChange={(date) => setSelectedStartDate(date)}
-                      options={{
-                        backgroundColor: '#080516',
-                        textHeaderColor: '#469ab6',
-                        textDefaultColor: '#FFFFFF',
-                        selectedTextColor: '#FFF',
-                        mainColor: '#469ab6',
-                        textSecondaryColor: '#FFFFFF',
-                        borderColor: 'rgba(122, 146, 165, 0.1)',
-                      }}
-                    />
-                    <TouchableOpacity onPress={handleOnPressStartDate}>
-                      <Text style={{ color: 'white' }}>Close</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </Modal>
             </KeyboardAvoidingView>
           )}
         />

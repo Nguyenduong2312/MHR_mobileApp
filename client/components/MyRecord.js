@@ -17,18 +17,19 @@ export default function Basic() {
   console.log('my record: ',SyncStorage.get('token'));
 
   useEffect(() => {
-    fetch('http://192.168.1.30:5000/account/user', {
+    fetch('http://192.168.1.27:5000/account/user', {
         credentials: 'include',
         method: 'GET',
         headers: {
-            authorization: Bearer ${SyncStorage.get('token')},
+            authorization: `Bearer ${SyncStorage.get('token')}`,
         },
     })
         .then((res) => res.json())
         .then((account) => {
-            fetch(http://192.168.1.30:5000/record/${account.account.id}, {
+            console.log('id:', account.account.id);
+            fetch(`http://192.168.1.27:5000/record/${account.account.id}`, {
                 headers: {
-                    authorization: Bearer ${SyncStorage.get('token')},
+                    authorization: `Bearer ${SyncStorage.get('token')}`,
                 },
             })
                 .then((res) => res.json())
@@ -59,7 +60,7 @@ export default function Basic() {
     closeRow(rowMap,data.item.key);
     const localhost = Platform.OS === "android" ? "10.0.2.2" : "127.0.0.1";
     const result = await FileSystem.downloadAsync(
-      http://192.168.1.30:5000/record/download/${data.item._id},//fetch
+      `http://192.168.1.27:5000/record/download/${data.item._id}`,//fetch
       FileSystem.documentDirectory + filename,
       {
         headers: {

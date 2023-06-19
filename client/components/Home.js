@@ -1,139 +1,69 @@
-import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
-import {useForm, Controller} from 'react-hook-form';
-import CustomButton from "./CustomButton";
-
 import {
   StyleSheet,
-  Text,
   View,
-  Image,
-  TextInput,
-  Button,
+  Text,
   TouchableOpacity,
-} from "react-native";
-export default function SignIn(props) {
-  const [username, setUserName] = useState("");
-  const [password, setPassword] = useState("");
-  const { handleSubmit, control } = useForm();
-  const onSubmit = (data) => {bgn 
-    console.log(data, "data");
-  };
+} from 'react-native';
+import { Card } from 'react-native-paper';
+const Custom = ({
+ screenName
+}) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.welcome}>WELCOME BACK!</Text> 
-      <Image style={styles.image} source={require("./images/a.png")} /> 
-      <StatusBar style="auto" />
-  
-      <StatusBar style="auto" />
-      <View style={styles.inputView}>
-        <TextInput
-          style={styles.TextInput}
-          placeholder="Type your user name"
-          placeholderTextColor=	"#787878"
-          onChangeText={(username) => setUserName(username)}
-          
-        /> 
-      </View> 
-      <View style={styles.inputView}>
-        <TextInput
-          style={styles.TextInput}
-          placeholder="Type your password"
-          placeholderTextColor=	"#787878"
-          secureTextEntry={true}
-          onChangeText={(password) => setPassword(password)}
-        /> 
-      </View> 
 
-     <CustomButton
-          text="Register"
-          onPress={()=>props.navigation.navigate('Login'),handleSubmit(onSubmit)}
-        />
+        <Card style={styles.list}>
+          <Text>{screenName}</Text>
+        </Card>
+  );
+};
+
+export default LoginScreen = (props, { navigation }) => {
+
+  return (
+  <View>
+
+     <Text style={styles.txt}>Account</Text>
+           <TouchableOpacity onPress={() => props.navigation.navigate('Login')}>
+           <Custom screenName="Edit Profile"/>
+         </TouchableOpacity>
+  <Text style={styles.txt}>List of requests</Text>
+           <TouchableOpacity onPress={() => props.navigation.navigate('Sent Requests')}>
+           <Custom screenName="Sent Requests"/>
+         </TouchableOpacity>
+       <TouchableOpacity onPress={() => props.navigation.navigate('Pending Requests')}>
+           <Custom screenName="Received Requests"/>
+         </TouchableOpacity>
+    <Text style={styles.txt}>Family</Text>
+           <TouchableOpacity onPress={() => props.navigation.navigate('Family')}>
+           <Custom screenName="Add new member"/>
+         </TouchableOpacity>
+           <Text style={styles.txt}>Record</Text>
+           <TouchableOpacity onPress={() => props.navigation.navigate('My Record')}>
+           <Custom screenName="My Records"/>
+         </TouchableOpacity>
+       <TouchableOpacity onPress={() => props.navigation.navigate('Received Records')}>
+           <Custom screenName="Received Records"/>
+         </TouchableOpacity>
+   
+      </View>
+    
+  );
+};
+
+const styles = StyleSheet.create({
+ txt:{
+   padding: 5,
+   fontSize:15,
+
+ },
+  list:{
+     marginTop:0,
+     height:50,
+     alignItems: 'center',
+     marginBottom:2,
+     width: '100%',
+
+    padding: 15,
  
 
-     
-      <TouchableOpacity style={styles.loginBtn}>
-        <Text style={styles.loginText}>LOGIN</Text> 
-      </TouchableOpacity> 
-      <Text style={styles.notHave}>Don't have an account?</Text> 
-      <TouchableOpacity onPress={()=>props.navigation.navigate('Register')}>
-        <Text style={styles.orsignup}>Create now</Text> 
-      </TouchableOpacity> 
-        
-    </View> 
-  );
-}
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#A7C7E7",
-    alignItems: "center",
-    justifyContent: "center",
-    
-  },
-
-  image: {
-    marginBottom: -10,
-    width: 350,
-    height: 200,
-    resizeMode: 'stretch',
-  },
-  inputView: {
-    backgroundColor:"#ffffff",
-    borderColor:"#6050DC",
-    width: "85%",
-    height: 50,
-    marginTop:10,
-    marginBottom: 10,
-   
-    
-  },
-  TextInput: {
-    height: 50,
-    color: '#6050DC',
-    fontSize:15,
-    justifyContent: "center",
-    marginLeft:27,
-   
-  },
-  welcome:{
-    marginTop:0,
-    fontSize: 30,
-    color:"#0039a6"
-  },
-  forgot_button: {
-    height: 30,
-    marginTop:10,
-    marginBottom: 20,
-    fontStyle: 'italic',
-    fontSize: 15,
-    color: "#0039a6",
-  
-  },
-  loginBtn: {
-    width: "45%",
-    height: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 0,  
-    borderRadius: 30,
-    backgroundColor: "#0039a6",
-  },
-  notHave:{
-    color: "#0039a6",
-    marginTop:30,
-    fontSize:15,
-    
-  },
-  loginText:{
-    color:"#ffffff",
-    fontWeight: 'bold',
-    fontSize:25,
-  },
-  orsignup:{
-    color: 'red',
-    textAlign: 'center',
-    fontStyle: 'italic',
-    fontSize:18,
-  },
+  }
 });

@@ -24,7 +24,7 @@ export default LoginScreen = (props,{navigation}) => {
   const passwordInputRef = createRef();
   const onRegisterPressed = async (data)  => {
     try{
-      fetch('http://192.168.68.129:5000/login', {
+      fetch('http://192.168.1.27:5000/login', {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json'
@@ -33,7 +33,7 @@ export default LoginScreen = (props,{navigation}) => {
       })
       .then((response) => {
         if(response.status === 200){
-          //props.navigation.navigate('Edit Profile');
+          props.navigation.navigate("My Record");
         }
         return response.json()
       })
