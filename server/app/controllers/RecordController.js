@@ -1,6 +1,8 @@
 const eccrypto = require('eccrypto');
 const fs = require('fs');
+
 const Record = require('../models/Record');
+const Ipfs = require('../ipfs/Ipfs');
 
 // setup web3 environment
 require('dotenv').config();
@@ -11,9 +13,6 @@ const web3 = new Web3(
 const contractAbi = require('../contracts/abi');
 const contractAddress = require('../contracts/contractAddress');
 const contractInstance = new web3.eth.Contract(contractAbi, contractAddress);
-
-// const ipfs = require('../ipfs/Ipfs')
-// const node = ipfs.loadIpfs()
 
 // const privateKeyA = eccrypto.generatePrivate();
 // const publicKeyA = eccrypto.getPublic(privateKeyA);
@@ -32,93 +31,80 @@ const publicKeyB = eccrypto.getPublic(Buffer.from(privateKeyB, 'hex'));
 // private key: dd9f05bb8788eb238be1f0d5dfe0bc8102536810babb78962a595abb33de4ba5 (64 hex charaters, 256 bit-value)
 // public key: 0xf5742F47DeB2943D550A65C95Bfa4fA6957B59b5 (64 hex characters, 512-bit (64 byte-value))
 
-const EncryptAES = require('./EncryptAES');
-const ECC = require('./ECC');
-const Account = require('../models/Account');
+const EncryptAES = require('../custom_modules/EncryptAES');
+const ECC = require('../custom_modules/ECC');
 
-const UploadDrive = require('./UploadToDrive');
-const DownloadDrive = require('./DownloadFromDrive');
+const UploadDrive = require('../custom_modules/UploadToDrive');
+const DownloadDrive = require('../custom_modules/DownloadFromDrive');
 const { drive } = require('googleapis/build/src/apis/drive');
 
 //lưu file vào public/uploads
-const path = `${process.cwd()}/server/public/uploads/`;
+const path = `${__dirname}/public/`;
 
 class UploadFileController {
-    getRecord(req, res) {
-        Record.find().then(function (record) {
-            res.status(200).json(record);
-        });
+    getRecordById(req, res) {
+        Record.find({ idReceiver: req.params.id, idSender: '' }).then(
+            (record) => {
+                res.status(200).json(record);
+            },
+        );
     }
 
-    getRecordByReceiverId(req, res) {
-        Record.find({ idReceiver: req.params.id }).then(function (record) {
-            res.status(200).json(record);
-        });
-    }
-
-    getRecordBySenderId(req, res) {
-        Record.find({ idSender: req.params.id }).then(function (record) {
-            res.status(200).json(record);
-        });
+    getReceivedRecordById(req, res) {
+        Record.find({ idReceiver: req.params.id, idUploader: '' }).then(
+            (record) => {
+                res.status(200).json(record);
+            },
+        );
     }
 
     upload(req, res) {
-        console.log('uplaod');
-        if (req.files === null) {
-            return res.send('No file uploaded');
+        if (req.body.id === '') {
+            return res.send('Id can not be empty!');
+        } else if (req.files === null) {
+            return res.send('No file uploaded!');
         }
-        else if(req.body.id === ''){
-            return res.send('Id can not be empty');
-        }
-
-        //uploadFile
         const file = req.files.file;
-
+        //uploadFile
         file.mv(path + file.name, async (err) => {
             if (err) {
-                console.log('lỗi');
-                return res.status(500).send(err);
+                return res.status(220).send(err);
             }
             try {
-                console.log('run');
                 const data = fs.readFileSync(path + file.name);
-
-                //generate khóa k và mã hóa nội dung tập tin
                 const { key, en_data } = EncryptAES.encrypt(data);
-                let googleFileId = null;
+                // let googleFileId = null;
+                let ipfsCID;
                 try {
                     // file written successfully
                     fs.writeFileSync(path + file.name, en_data);
                     //up defile to drive
-                    console.log(path + file.name, file.name);
-                    const res = await UploadDrive.upload(
-                        path + file.name,
-                        file.name,
-                    );
-                    googleFileId = res.data.id;
+                    // const res = await UploadDrive.upload(
+                    //     path + file.name,
+                    //     file.name,
+                    // );
+                    // googleFileId = res.data.id;
+                    ipfsCID = await Ipfs.uploadFile(path + file.name);
                 } catch (err) {
                     console.error(err);
                 }
+
                 //mã hóa k bằng ECC
                 //1. Lấy public key từ id BN
 
-                const acc = await Account.findOne({ id: req.body.id })
-                .then((account) =>  {
-                    const record = new Record();
-                    record.idReceiver = req.body.id;
-                    record.idSender = req.session.user.id;
-                    record.fileName = file.name;
-                    record
-                        .save()
-                        .catch(() => res.json({ status: false }));
+                let record;
+                record = new Record();
+                record.idReceiver = req.body.id;
+                record.idUploader = req.user.id;
+                record.fileName = file.name;
+                record.save().catch(() => {
+                    res.status(400);
                 });
-                console.log('pk', acc);
-                console.log('keyB', publicKeyB);
-                console.log('string keyB', publicKeyB.toString('hex'));
 
+                //console.log('keyB', publicKeyB);
+                // console.log('string keyB', publicKeyB.toString('hex'));
                 //2. Mã hóa khóa k
                 const token = await ECC.encrypt(key, publicKeyB);
-
                 // chuyen token thanh string de luu len blockchain
                 const stringToken = JSON.stringify({
                     iv: token.iv.toString('hex'),
@@ -126,13 +112,13 @@ class UploadFileController {
                     mac: token.mac.toString('hex'),
                     ephemPublicKey: token.ephemPublicKey.toString('hex'),
                 });
+                console.log('stringToken: ', stringToken);
 
                 // transaction data
                 const owner = accountB.address;
-                const cid = googleFileId;
+                const cid = ipfsCID;
                 const fileName = file.name;
                 const encryptedKey = stringToken;
-
                 // create the transaction object
                 const txObject = {
                     from: accountA.address,
@@ -142,9 +128,8 @@ class UploadFileController {
                         .createEHR(owner, cid, fileName, encryptedKey)
                         .encodeABI(),
                 };
-
                 // sign the transaction
-                console.log('Signing tracsaction');
+                ///console.log('Signing tracsaction');
                 web3.eth.accounts
                     .signTransaction(txObject, accountA.privateKey)
                     .then((signedTx) => {
@@ -154,38 +139,50 @@ class UploadFileController {
                             .on('receipt', (receipt) => {
                                 console.log('Transaction receipt:', receipt);
                             })
+
                             .on('error', (error) => {
                                 console.error('Error sending EHR:', error);
+                            })
+                            .then(() => {
+                                fs.unlinkSync(path + file.name);
+                                return res.status(200).send(`Uploaded!`);
                             });
                     })
                     .catch((error) => {
                         console.error('Error signing transaction:', error);
                     });
+                contractInstance.methods
+                    .numberOfRecords()
+                    .call()
+                    .then(async (result) => {
+                        record.idOnChain = result;
+                        record.save();
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
             } catch (err) {
                 console.error(err);
             }
         });
-
-        res.status(200).json({ status: true });
     }
 
     downloadRecord(req, res) {
         const { id } = req.params;
-
         contractInstance.methods
             .numberOfRecords()
             .call()
             .then(async (result) => {
-                if (id < 0 || id >= result) {
-                    return res.status(404).json({ msg: 'id out of range' });
+                const record = await Record.findById(id);
+                if (record.idOnChain < 0 || record.idOnChain >= result) {
+                    return res.status(404).send('id out of range');
                 }
                 const txRecord = await contractInstance.methods['ehrs'](
-                    result - 1,
+                    record.idOnChain,
                 ).call();
                 console.log('DECRYPTING');
 
                 //decrypt
-
                 // chuyen string thanh buffer
                 let encryptedContent = JSON.parse(txRecord.encryptedKey);
                 encryptedContent = {
@@ -197,76 +194,33 @@ class UploadFileController {
                         'hex',
                     ),
                 };
-
-                let buffer = null;
-                // // DownloadFromDrive.download(
-                // //     txRecord.ehrLink,
-                // //     txRecord.fileName,
-                // // ).then((driveService) => {
-                // //     let buf = [];
-                // //     driveService.data.on('data', (e) => buf.push(e));
-                // //     driveService.data.on('end', () => {
-                // //         buffer = Buffer.concat(buf);
-                // //         console.log(buffer);
-                // //         res.status(200);
-                // //     });
-                // // });
-                const driveService = await DownloadDrive.download(
+                console.log('res1');
+                Ipfs.downloadFile(
                     txRecord.cid,
-                    // txRecord.fileName,
-                );
-                let buf = [];
-                driveService.data.on('data', (e) => buf.push(e));
-                driveService.data.on('end', async () => {
-                    buffer = Buffer.concat(buf);
-
-                    const aesKey = await ECC.decrypt(
-                        encryptedContent,
-                        Buffer.from(privateKeyB, 'hex'),
-                    );
-                    console.log(aesKey);
-
-                    const originalText = EncryptAES.decrypt(
-                        buffer.toString(),
-                        aesKey,
-                    );
-                    console.log(originalText);
-
-                    // console.log("TEXT")
-                    try {
-                        // file written successfully
-                        fs.writeFileSync(
-                            path + 'de_' + txRecord.fileName,
-                            originalText,
-                        );
-                        res.status(200).download(
-                            path + 'de_' + txRecord.fileName,
-                        );
-                    } catch (err) {
-                        console.error(err);
-                        res.status(500);
-                    }
+                    path + 'de_' + txRecord.fileName,
+                    encryptedContent,
+                ).then(() => {
+                    console.log('res');
+                    res.status(200).download(path + 'de_' + txRecord.fileName);
+                    //fs.unlinkSync(path + 'de_' + txRecord.fileName);
                 });
             })
             .catch((error) => {
                 console.error(error);
             });
-
-        // Record.findById(id)
-        //     .then(record => {
-        //         if (!record) {
-        //             return res.status(404).send('Record not found');
-        //         }
-        //         console.log(record);
-        //         const file = record.name;
-        //         const path = `${process.cwd()}/server/public/uploads/`;
-        //         const filePath = path + file;
-        //         res.status(200).download(filePath);
-        //     })
-        //     .catch(err => {
-        //         console.log(err);
-        //         res.status(500).send('Server error');
-        //     });
+    }
+    deleteRecord(req, res) {
+        Record.findOneAndRemove({ _id: req.params.id })
+            .then(() => res.json({ status: true }))
+            .catch(() => res.json({ status: false }));
+    }
+    deleteFile(req, res) {
+        try {
+            fs.unlinkSync(path + 'de_' + req.body.filename);
+            return res.status(200).send('xóa thành công');
+        } catch (err) {
+            console.error(err);
+        }
     }
 }
 

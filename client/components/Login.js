@@ -24,7 +24,8 @@ export default LoginScreen = (props,{navigation}) => {
   const passwordInputRef = createRef();
   const onRegisterPressed = async (data)  => {
     try{
-      fetch('http://192.168.1.27:5000/login', {
+      console.log('login');
+      fetch('http://192.168.1.27:5000/account/login', {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json'

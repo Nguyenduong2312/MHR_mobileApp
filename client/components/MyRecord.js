@@ -26,8 +26,9 @@ export default function Basic() {
     })
         .then((res) => res.json())
         .then((account) => {
-            console.log('id:', account.account.id);
-            fetch(`http://192.168.1.27:5000/record/${account.account.id}`, {
+          console.log('acc', account);
+            console.log('id:', account.id);
+            fetch(`http://192.168.1.27:5000/record/${account.id}`, {
                 headers: {
                     authorization: `Bearer ${SyncStorage.get('token')}`,
                 },
@@ -56,6 +57,7 @@ export default function Basic() {
     </TouchableHighlight>
   );
   const downloadFromAPI = async (data,rowMap) => {
+    console.log('down', data.item._id);
     const filename="download";
     closeRow(rowMap,data.item.key);
     const localhost = Platform.OS === "android" ? "10.0.2.2" : "127.0.0.1";

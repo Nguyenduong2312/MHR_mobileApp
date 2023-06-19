@@ -2,27 +2,33 @@ const Account = require('../models/Account');
 var eccrypto = require('eccrypto');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+const jwt = require('jsonwebtoken');
+
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: '30d',
+    });
+};
 
 class RegisterController {
     createAccount(req, res) {
-        console.log('req: ', req.body);
-        console.log('req: ', req.body.password2);
         if (
             !req.body.username ||
             !req.body.password1 ||
-            !req.body.password2
+            !req.body.password2 ||
+            !req.body.role
         ) {
-            return res.status(220).json({msg: 'This field can be empty.'});
+            return res.status(220).send('This field can be empty.');
         } else if (req.password1 !== req.password2) {
             return res
                 .status(220)
-                .json({msg:"Those passwords didn't match. Try again."});
+                .send("Those passwords didn't match. Try again.");
         }
         Account.findOne({ username: req.body.username }).then((account) => {
             if (account) {
                 return res
                     .status(220)
-                    .json({msg: 'That username is taken. Try another.'});
+                    .send('That username is taken. Try another.');
             } else {
                 // Create temporary account object to assign value
                 const tmp = new Account();
@@ -30,12 +36,12 @@ class RegisterController {
                 const privateKey = eccrypto.generatePrivate();
                 tmp.privateKey = JSON.stringify(privateKey);
                 tmp.publicKey = JSON.stringify(eccrypto.getPublic(privateKey));
+                tmp.role = req.body.role;
                 // Increment id
                 Account.findOne({})
                     .lean()
                     .sort({ id: 'desc' })
                     .then((lastAccount) => {
-                        console.log('la: ', lastAccount);
                         if (lastAccount) {
                             tmp.id = lastAccount.id + 1;
                         } else {
@@ -50,22 +56,22 @@ class RegisterController {
 
                                 // Create another account with assigned value and save to database
                                 const account = new Account(tmp);
-                                console.log('acc: ',account);
-                                
                                 account
                                     .save()
                                     .then(() => {
-                                        return res.status(200).json({msg: ''});
+                                        //req.session.user = account;
+                                        res.status(200).json({
+                                            token: generateToken(account._id),
+                                        });
                                     })
                                     .catch(() => {
-                                        console.log("khong save");
-                                        return res.status(500).json({msg: 'Error'});
+                                        res.status(500).send('');
                                     });
                             },
                         );
                     })
                     .catch(() => {
-                        return res.status(500).json({msg: 'Error'});
+                        res.status(500).send('');
                     });
             }
         });

@@ -17,7 +17,7 @@ export default function SignUpScreen(props) {
     data.role='patient'
     console.log(data);
     props.navigation.navigate('Profile');
-     await fetch('http://192.168.68.129:5000/register', {
+     await fetch('http://192.168.68.129:5000/account/register', {
       method: 'POST',
       headers: {
        'Content-Type': 'application/json'

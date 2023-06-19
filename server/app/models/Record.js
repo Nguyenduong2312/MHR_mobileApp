@@ -4,11 +4,13 @@ const Schema = mongoose.Schema;
 
 const Record = new Schema(
     {
-        idSender: { type: String, require: true },
+        idUploader: { type: String, default: '' },
+        idSender: { type: String, default: '' },
         idReceiver: { type: String, require: true },
         fileName: { type: String, default: '' },
         typeRecord: { type: String, default: '' },
         createdDate: { type: Date, default: Date.now },
+        idOnChain: { type: String, default: '' },
     },
     {
         timestamps: true,
