@@ -12,11 +12,11 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 
 export default function Basic() {
   const [requestList, setRequestList] = useState();
-
+  const [length, setLength] = useState(0);
   console.log('my request: ',SyncStorage.get('token'));
 
   useEffect(() => {
-    fetch(`http://192.168.1.9:5000/account/user`, {
+    fetch(`http://192.168.1.27:5000/account/user`, {
         credentials: 'include',
         method: 'GET',
         headers: {
@@ -27,7 +27,7 @@ export default function Basic() {
         .then((account) => {
           console.log('acc', account);
             console.log('id:', account.id);
-            fetch(`http://192.168.1.9:5000/requestRecord/receiver/${account.id}`, {
+            fetch(`http://192.168.1.27:5000/requestRecord/receiver/${account.id}`, {
                 headers: {
                     authorization: `Bearer ${SyncStorage.get('token')}`,
                 },
@@ -35,21 +35,12 @@ export default function Basic() {
                 .then((res) => res.json())
                 .then((request) => {
                   console.log('request ', request);
-                  setRequestList(records);
-                },[]);
+                  setRequestList(request);
+                  setLength(request.length);
+                });
         });
-    }, []);
-
-
-
-
-  let dt=[{id:'2',filename:"file1",status:"Accepted"},{id:"123",filename:"file2",status:"Rejected"},{id:"134",filename:"file3",status:"Waitting"}]
-  let a=dt.length;
-    const [listData, setListData] = useState(
-        Array(a)
-            .fill('')
-            .map((_, i) => ({ key: `${i}`, id: dt[i].id, filename: dt[i].filename,status:dt[i].status}))
-    );
+    }, [length]);
+    console.log('requestList', requestList);
 
   const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
@@ -76,8 +67,8 @@ export default function Basic() {
       style={styles.rowFront}
       underlayColor={'#AAA'}>
       <View>
-        <Text style={styles.txt}>Receiver ID: {data.item.id}</Text>
-        <Text style={styles.txt}>File name: {data.item.filename}</Text>
+        <Text style={styles.txt}>Receiver ID: {data.item.idReceiver}</Text>
+        <Text style={styles.txt}>File name: {data.item.nameRecord}</Text>
       {data.item.status=='Accepted'  ? (
           <Text style={styles.accepted}>[{data.item.status}]</Text>
         ) : null}
@@ -100,11 +91,37 @@ export default function Basic() {
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnLeft]}
-        onPress={() => deleteRow(rowMap, data.item.key)}>
+        onPress={() => handleDelete(data,rowMap)}>
         <Text style={styles.backTextWhite}>Delete</Text>
       </TouchableOpacity>
     </View>
   );
+
+  const handleDelete = async (data,rowMap) => {
+    console.log("ID at now is",data.item._id);
+    try {
+      fetch(`http://192.168.1.27:5000/requestRecord/${data.item._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data.item)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.status === true){
+          console.log('xóa thành công');
+          setLength(requestList.length);
+        }
+        else{
+          console.log('fail');
+        }
+      })
+      //props.setLengthOfRequestList((prev) => prev - 1);
+  } catch (err) {
+      console.log('lỗi');
+  }
+  };
 
   return (
     <View style={styles.container}>

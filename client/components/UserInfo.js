@@ -10,14 +10,15 @@ import {
   TouchableOpacity,
 } from 'react-native';
 export default UserPro = ({props, route, navigation}) => {
+  console.log('route.params', route.params);
   let { id } = route.params || '';
   const [user, setUser] = useState({})
   console.log(
     'id:ps', id
   );
-  //const user={name:"ahihi",address:"fdkjf",email:"hd@",date:"12/12/2016",gender:"male"};
   useEffect(() => {
     console.log('detail');
+    
     fetch(`http://192.168.1.27:5000/account/${id}`, {
         credentials: 'include',
         method: 'GET',

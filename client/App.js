@@ -43,9 +43,9 @@ function MyDrawer() {
       <Drawer.Screen name="Received Requests" component={ReceivedRequests} />
       <Drawer.Screen name="Received Records" component={Received} />
       <Drawer.Screen name="Sent Requests" component={Sent} />
-         <Drawer.Screen name="View family member's profiles" component={ViewFam} />
-              <Drawer.Screen name="Add family member" component={Family} />
-                 <Drawer.Screen name="Relationship Requests" component={RelationshipRequests} />
+      <Drawer.Screen name="View family member's profiles" component={ViewFam} />
+      <Drawer.Screen name="Add family member" component={Family} />
+      <Drawer.Screen name="Relationship Requests" component={RelationshipRequests} />
     </Drawer.Navigator>
   );
 }

@@ -69,6 +69,7 @@ class LoginController {
     }
 
     user(req, res) {
+        console.log('usesr');
         Account.findOne({ _id: req.user._id }).then((account) => {
             res.send(account);
         });

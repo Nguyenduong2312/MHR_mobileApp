@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,12 +6,9 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-
+import SyncStorage from 'sync-storage';
 import { SwipeListView } from 'react-native-swipe-list-view';
-let dt = [
-  { id: '2', filename: 'file1' },
-  { id: '123', filename: 'file2' },
-];
+
 export default function Basic() {
 
   const [requestList, setRequestList] = useState();
@@ -19,7 +16,7 @@ export default function Basic() {
   console.log('my request: ',SyncStorage.get('token'));
 
   useEffect(() => {
-    fetch(`http://192.168.1.9:5000/account/user`, {
+    fetch(`http://192.168.1.27:5000/account/user`, {
         credentials: 'include',
         method: 'GET',
         headers: {
@@ -30,7 +27,7 @@ export default function Basic() {
         .then((account) => {
           console.log('acc', account);
             console.log('id:', account.id);
-            fetch(`http://192.168.1.9:5000/requestRecord/receiver/${account.id}`, {
+            fetch(`http://192.168.1.27:5000/requestRecord/receiver/${account.id}`, {
                 headers: {
                     authorization: `Bearer ${SyncStorage.get('token')}`,
                 },
@@ -38,18 +35,10 @@ export default function Basic() {
                 .then((res) => res.json())
                 .then((request) => {
                   console.log('request ', request);
-                  setRequestList(records);
+                  setRequestList(request);
                 },[]);
         });
     }, []);
-
-
-  let a = dt.length;
-  const [listData, setListData] = useState(
-    Array(a)
-      .fill('')
-      .map((_, i) => ({ key: `${i}`, id: dt[i].id, filename: dt[i].filename }))
-  );
 
   const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
@@ -75,8 +64,8 @@ export default function Basic() {
       style={styles.rowFront}
       underlayColor={'#AAA'}>
       <View>
-        <Text style={styles.txt}>Sender ID: {data.item.id}</Text>
-        <Text style={styles.txt}>File name: {data.item.filename}</Text>
+        <Text style={styles.txt}>Sender ID: {data.item.idSender}</Text>
+        <Text style={styles.txt}>File name: {data.item.nameRecord}</Text>
       </View>
     </TouchableHighlight>
   );

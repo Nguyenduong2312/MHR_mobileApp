@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,18 +6,43 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
+import SyncStorage from 'sync-storage';
 
 import { SwipeListView } from 'react-native-swipe-list-view';
 
+export default function Basic({navigation}) {
+  const [requestList, setRequestList] = useState();
+  const [lengthOfRequestList, setLengthOfRequestList] = useState(0);
 
-export default function Basic(props) {
-  let dt=[{id:'2',filename:"file1"},{id:"123",filename:"file2"}]
-  let a=dt.length;
-    const [listData, setListData] = useState(
-        Array(a)
-            .fill('')
-            .map((_, i) => ({ key: `${i}`, id: dt[i].id, role: dt[i].filename}))
-    );
+  console.log('my request: ',SyncStorage.get('token'));
+
+  useEffect(() => {
+    fetch(`http://192.168.1.27:5000/account/user`, {
+        credentials: 'include',
+        method: 'GET',
+        headers: {
+            authorization: `Bearer ${SyncStorage.get('token')}`,
+        },
+    })
+    .then((res) => res.json())
+    .then((account) => {
+      console.log('acc', account);
+      fetch(
+        `http://192.168.1.27:5000/membership/receiver/${account.id}`,
+        {
+            credentials: 'include',
+            method: 'GET',
+        },
+      )
+      .then((res) => res.json())
+      .then((requests) => {
+        setRequestList(requests);
+        setLengthOfRequestList(requests.length);
+      });
+    });
+  }, [lengthOfRequestList]);
+
+  console.log('requestList', requestList);
 
   const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
@@ -34,7 +59,7 @@ export default function Basic(props) {
   };
  
   const onRowDidOpen = (rowKey) => {
-    console.log('This row opened', rowKey);
+    //console.log('This row opened', rowKey);
   };
 
   const renderItem = (data) => (
@@ -43,8 +68,8 @@ export default function Basic(props) {
       style={styles.rowFront}
       underlayColor={'#AAA'}>
       <View>
-        <Text style={styles.txt}>Sender ID: {data.item.id}</Text>
-        <Text style={styles.txt}>Role: Your {data.item.role}</Text>
+        <Text style={styles.txt}>Sender ID: {data.item.senderId}</Text>
+        <Text style={styles.txt}>Role: Your {data.item.senderRole}</Text>
       </View>
     </TouchableHighlight>
   );
@@ -62,30 +87,52 @@ export default function Basic(props) {
         onPress={() => handleReject(data,rowMap)}>
         <Text style={styles.backTextWhite}>Reject</Text>
       </TouchableOpacity>
-           <TouchableOpacity
-        style={[styles.backRightBtn, styles.backMidBtnLeft]}
-        onPress={() => handleViewIfo(data,rowMap)}>
-        <Text style={styles.backTextWhite}>View Info</Text>
-      </TouchableOpacity>
     </View>
   );
   const handleAccept = async (data,rowMap) => {
-    console.log("ID at now is",data.item.id);
-    deleteRow(rowMap, data.item.key)
-    };
-    
-      const handleReject = async (data,rowMap) => {
-    console.log("ID at now is",data.item.id);
-     deleteRow(rowMap, data.item.key)
-    };
-      const handleViewIfo = (data,rowMap) => {
-     console.log("ID=",data.item.id);
-     props.navigation.navigate('User Info',{
-            userid: data.item.id, acceptstatus:"no"}
-     );
-     close(rowMap,data.item.key)
-
+    console.log("ID at now is",data.item._id);
+    try {
+      fetch(`http://192.168.1.27:5000/membership/${data.item._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data.item)
+      })
+      //.then(res => res.json())
+      //.then(res => {console.log(res);})
+      //props.setLengthOfRequestList((prev) => prev - 1);
+  } catch (err) {
+      console.log('lỗi');
+  }
+    //deleteRow(rowMap, data.item.key)
   };
+    
+  const handleReject = async (data,rowMap) => {
+    console.log("ID at now is",data.item._id);
+    try {
+      fetch(`http://192.168.1.27:5000/membership/${data.item._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data.item)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.status === true){
+          console.log('xóa thành công');
+        }
+        else{
+          console.log('fail');
+        }
+      })
+      //props.setLengthOfRequestList((prev) => prev - 1);
+  } catch (err) {
+      console.log('lỗi');
+  }
+  };
+
     
 
   return (
@@ -95,7 +142,7 @@ export default function Basic(props) {
        <Text style={styles.title}>Swipe Left to accept/reject requests</Text>
       </View>
       <SwipeListView
-        data={listData}
+        data={requestList}
         renderItem={renderItem}
         renderHiddenItem={renderHiddenItem}
         leftOpenValue={75}

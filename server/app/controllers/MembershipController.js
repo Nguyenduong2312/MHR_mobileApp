@@ -12,6 +12,7 @@ class MembershipController {
     }
 
     getRequestfromReceiver(req, res) {
+        console.log('getRequestfromReceiver');
         RelationshipRequest.find({
             receiverId: req.params.id,
             status: 'Waitting',
@@ -79,6 +80,8 @@ class MembershipController {
     }
 
     updateRequest(req, res) {
+        console.log('updateRequest',req.body);
+        console.log('req.params.id', req.params.id);
         const roleForReceiver = { [req.body.senderId]: req.body.senderRole };
         const roleForSender = { [req.body.receiverId]: req.body.receiverRole };
 
@@ -99,6 +102,7 @@ class MembershipController {
     }
 
     deleteRequest(req, res) {
+        console.log('delete');
         RelationshipRequest.findOneAndRemove({ _id: req.params.id })
             .then(() => res.json({ status: true }))
             .catch(() => res.json({ status: false }));
