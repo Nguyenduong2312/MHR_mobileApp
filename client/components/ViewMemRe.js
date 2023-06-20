@@ -6,7 +6,6 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-import UserInfo from "./UserInfo";
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 let dt = [
@@ -48,11 +47,9 @@ export default function Basic(props) {
     </TouchableHighlight>
   );
   const viewDetails = (data) => {
-     const id=data.item.id;
      console.log("ID=",data.item.id);
-     <UserInfo/>;
      props.navigation.navigate('User Info',{
-            userid: data.item.id,}
+            userid: data.item.id, acceptstatus:"yes"}
      );
 
   };
