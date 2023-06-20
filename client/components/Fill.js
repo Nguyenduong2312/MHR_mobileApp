@@ -23,7 +23,7 @@ export default LoginScreen = (props) => {
   const { control, handleSubmit } = useForm();
   const [user, setUser] = useState("");
   useEffect(() => {
-    fetch('http://192.168.68.129:5000/account/user', {
+    fetch('http://192.168.1.9:5000/account/user', {
         credentials: 'include',
         method: 'GET',
         headers: {
@@ -35,7 +35,7 @@ export default LoginScreen = (props) => {
             console.log('acc : ', account);
             setUser(account);
         });
-    }, []);
+    }, [user.id]);
 
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);

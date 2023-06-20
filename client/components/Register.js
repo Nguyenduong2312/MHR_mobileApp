@@ -14,7 +14,7 @@ export default function SignUpScreen(props) {
   const pwd = watch('password1');
   
   const onRegisterPressed = async (data) => {
-    data.role='patient'
+    data.role='Patient'
     console.log(data);
     props.navigation.navigate('Profile');
     fetch(`http://192.168.1.9:5000/account/signup`, {

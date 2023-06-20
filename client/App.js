@@ -3,11 +3,13 @@ import Profile from './components/Fill';
 import Record from './components/MyRecord';
 import Register from './components/Register';
 import ReceivedRequests from './components/ReceivedRequests';
-//import Family from './components/Family';
+import Family from './components/Family';
+import ViewFam from './components/ViewMemRe'
 import Home from './components/Home';
 import Received from './components/ReceivedRecord';
 import Sent from './components/SentRequests';
 import { NavigationContainer } from '@react-navigation/native';
+import UserInfo from "./components/UserInfo"
 
 import {
   createDrawerNavigator,
@@ -39,6 +41,7 @@ function MyDrawer() {
       <Drawer.Screen name="Received Requests" component={ReceivedRequests} />
       <Drawer.Screen name="Received Records" component={Received} />
       <Drawer.Screen name="Sent Requests" component={Sent} />
+         <Drawer.Screen name="View family member's profiles" component={ViewFam} />
     </Drawer.Navigator>
   );
 }
@@ -46,7 +49,7 @@ function MyDrawer() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator initialRouteName="View family member's profiles">
         <Stack.Screen
           name="Home"
           component={MyDrawer}
@@ -55,7 +58,10 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen name="Family" component={Profile} />
+        <Stack.Screen name="Family" component={Family} />
+        <Stack.Screen name="User Info" component={UserInfo} />
+        <Stack.Screen name="User Record" component={Record} />
+        <Stack.Screen name="User Relationship" component={ViewFam}/>
          <Stack.Screen
         
           name="Edit Profile"
@@ -82,6 +88,12 @@ export default function App() {
           component={MyDrawer}
           options={{ headerShown: false }}
         />
+            <Stack.Screen
+          name=" View family member's profiles"
+          component={MyDrawer}
+          options={{ headerShown: false }}
+        />
+       
       </Stack.Navigator>
     </NavigationContainer>
   );

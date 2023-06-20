@@ -21,7 +21,7 @@ export default function Basic() {
         credentials: 'include',
         method: 'GET',
         headers: {
-            authorization: `Bearer ${SyncStorage.get('token')}`,
+          authorization: `Bearer ${SyncStorage.get('token')}`,
         },
     })
         .then((res) => res.json())
