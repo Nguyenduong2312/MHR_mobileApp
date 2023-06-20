@@ -23,7 +23,7 @@ export default LoginScreen = (props,{navigation}) => {
   const [users,setUsers] = useState([]);
   const passwordInputRef = createRef();
   const onRegisterPressed = async (data)  => {
-    try{
+  /*  try{
       fetch('http://192.168.1.27:5000/login', {
         method: 'POST',
         headers: {
@@ -50,8 +50,8 @@ export default LoginScreen = (props,{navigation}) => {
     catch(error) {
       setLoading(false);
       console.error(error);
-    };
-    //props.navigation.navigate('Profile');
+    }*/
+    props.navigation.navigate('Home');
  
   };
   //console.log('rokenS',SyncStorage.get('token'));
@@ -84,7 +84,15 @@ export default LoginScreen = (props,{navigation}) => {
             },
           }}
         />
-      
+       <CustomInput 
+          name="privateKey"
+          control={control}
+          placeholder="Private Key"   placeholderTextColor="#8b9cb5"
+
+          rules={{
+            required: 'PrivateKey is required',
+          }}
+        />
         <CustomButton
           text="Login"
           onPress={
