@@ -32,7 +32,7 @@ export default LoginScreen = (props) => {
      try{
       const data={id,role}
       console.log('daraa: ',data);
-      fetch('http://192.168.1.9:5000/membership', {
+      fetch('http://192.168.1.27:5000/membership', {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',

@@ -26,7 +26,7 @@ export default LoginScreen = (props,{navigation}) => {
     try{
       console.log('login',process.env.localhost);
       console.log('data', );
-      fetch(`http://192.168.1.9:5000/account/login`, {
+      fetch(`http://192.168.1.27:5000/account/login`, {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json'

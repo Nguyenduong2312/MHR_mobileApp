@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 import {
   StyleSheet,
   Text,
@@ -9,6 +8,8 @@ import {
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import SyncStorage from 'sync-storage';
+
+import UserInfo from "./UserInfo";
 
 export default function Basic({props,route,navigation}) {
 
@@ -20,7 +21,7 @@ export default function Basic({props,route,navigation}) {
     setParentList([]);
     setChildList([]);
     console.log('fet',id || 'user');
-    fetch(`http://192.168.1.9:5000/account/${id || 'user'}`, {
+    fetch(`http://192.168.1.27:5000/account/${id || 'user'}`, {
         credentials: 'include',
         method: 'GET',
         headers: {
@@ -34,7 +35,7 @@ export default function Basic({props,route,navigation}) {
           console.log('relation: ', account.relationship);
           const accRelationship = account.relationship;
           for (let key in accRelationship) {
-              fetch(`http://192.168.1.9:5000/account/id/${key}`, {
+              fetch(`http://192.168.1.27:5000/account/id/${key}`, {
                   credentials: 'include',
                   method: 'GET',
               })
@@ -75,11 +76,11 @@ export default function Basic({props,route,navigation}) {
     </TouchableHighlight>
   );
   const viewDetails = (data) => {
-     const id=data.item.id;
+     const id =data.item.id;
      console.log("ID=",data.item._id);
      <UserInfo/>;
-     navigation.navigate(`User Info`,{
-            id: data.item._id,}
+      navigation.navigate(`User Info`,{
+          id: data.item._id,}
      );
 
   };

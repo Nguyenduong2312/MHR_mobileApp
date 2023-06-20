@@ -18,7 +18,9 @@ export default HomeScreen = (props,) => {
         onPress={() => props.navigation.navigate('Edit Profile')}>
         <Custom screenName="Edit Profile" />
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => LogOut()}>
+      <TouchableOpacity onPress={() => props.navigation.navigate('Login', {
+        isAuth: true
+      })}>
         <Custom screenName="Log Out" />
       </TouchableOpacity>
       <Text style={styles.txt}>List of requests</Text>

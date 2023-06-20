@@ -10,32 +10,35 @@ import SyncStorage from 'sync-storage';
 
 import { SwipeListView } from 'react-native-swipe-list-view';
 import * as FileSystem from 'expo-file-system';
-export default function Basic() {
+export default function Basic({route}) {
     ///
   const [listData, setListData] = useState();
+  requestedCheck = true;
+
+  if (typeof route.params !== 'undefined'){
+    requestedCheck = route.params.isAuth
+  }
 
   console.log('my record: ',SyncStorage.get('token'));
 
   useEffect(() => {
-    fetch(`http://192.168.1.9:5000/account/user`, {
+    fetch('http://192.168.1.27:5000/account/user', {
         credentials: 'include',
         method: 'GET',
         headers: {
-          authorization: `Bearer ${SyncStorage.get('token')}`,
+            authorization: `Bearer ${SyncStorage.get('token')}`,
         },
     })
         .then((res) => res.json())
         .then((account) => {
-          console.log('acc', account);
             console.log('id:', account.id);
-            fetch(`http://192.168.1.9:5000/record/${account.id}`, {
+            fetch(`http://192.168.1.27:5000/record/${account.id}`, {
                 headers: {
                     authorization: `Bearer ${SyncStorage.get('token')}`,
                 },
             })
                 .then((res) => res.json())
                 .then((records) => {
-                  console.log('record ', records);
                     setListData(records);
                 },[]);
         });
@@ -58,12 +61,11 @@ export default function Basic() {
     </TouchableHighlight>
   );
   const downloadFromAPI = async (data,rowMap) => {
-    console.log('down', data.item._id);
     const filename="download";
     closeRow(rowMap,data.item.key);
     const localhost = Platform.OS === "android" ? "10.0.2.2" : "127.0.0.1";
     const result = await FileSystem.downloadAsync(
-      `http://192.168.1.9:5000/record/download/${data.item._id}`,//fetch
+      `http://192.168.1.27:5000/record/download/${data.item._id}`,//fetch
       FileSystem.documentDirectory + filename,
       {
         headers: {
@@ -72,6 +74,11 @@ export default function Basic() {
       }
     );
     save(result.uri, filename, result.headers["Content-Type"]);
+  };
+
+  const sendRequest = async (data,rowMap) => {
+    console.log("ID at now is",data.item.id);
+       closeRow(rowMap,data.item.key);
   };
 
   const save = async (uri, filename, mimetype) => {
@@ -94,11 +101,19 @@ export default function Basic() {
 
   const renderHiddenItem = (data, rowMap) => (
     <View style={styles.rowBack}>
+      {requestedCheck===true  ? (
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnLeft]}
-        onPress={() => {downloadFromAPI(data,rowMap)}}>
+
+        onPress={() => downloadFromAPI(data,rowMap)}>
         <Text style={styles.backTextWhite}>Download</Text>
       </TouchableOpacity>
+       ) :   <TouchableOpacity
+        style={[styles.backRightBtn, styles.backRightBtnLeft]}
+
+        onPress={() => sendRequest(data,rowMap)}>
+        <Text style={styles.backTextWhite}>Request</Text>
+      </TouchableOpacity>}
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnRight]}
         onPress={() => closeRow(rowMap, data.item.key)}>
@@ -123,7 +138,6 @@ export default function Basic() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
@@ -154,9 +168,7 @@ const styles = StyleSheet.create({
 
   rowBack: {
     alignItems: 'center',
-
     flex: 1,
-
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingLeft: 15,

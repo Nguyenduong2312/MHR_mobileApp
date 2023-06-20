@@ -36,6 +36,7 @@
         "express-async-handler": "^1.2.0",
         "express-fileupload": "^1.4.0",
         "express-session": "^1.17.3",
+        "file-system": "^2.2.2",
         "googleapis": "^118.0.0",
         "http-proxy-middleware": "^2.0.6",
         "ipfs-core": "^0.18.1",

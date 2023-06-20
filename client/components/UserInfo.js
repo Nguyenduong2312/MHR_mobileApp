@@ -1,4 +1,4 @@
-
+import React, { useState, useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import SyncStorage from 'sync-storage';
 
@@ -18,7 +18,7 @@ export default UserPro = ({props, route, navigation}) => {
   //const user={name:"ahihi",address:"fdkjf",email:"hd@",date:"12/12/2016",gender:"male"};
   useEffect(() => {
     console.log('detail');
-    fetch(`http://192.168.1.9:5000/account/${id}`, {
+    fetch(`http://192.168.1.27:5000/account/${id}`, {
         credentials: 'include',
         method: 'GET',
         headers: {
@@ -35,7 +35,7 @@ export default UserPro = ({props, route, navigation}) => {
 
 
   const viewRecord = () => {
-    navigation.navigate('User Record', {id:id});
+    navigation.navigate('User Record', {id: id, isAuth:false });
   };
   const viewRelation=()=>{
     navigation.navigate("User Relationship", {id:id});
@@ -95,9 +95,6 @@ export default UserPro = ({props, route, navigation}) => {
             </View>
           </View>
         </View>
-  {acceptstatus=='yes'  ? (
-     
-       
         <View style={styles.centeredView}>
          <TouchableOpacity style={styles.container}>
           <Text
@@ -114,7 +111,7 @@ export default UserPro = ({props, route, navigation}) => {
           </Text>
         </TouchableOpacity>
         </View>
-   ) : null}
+
       </ScrollView>
     </SafeAreaProvider>
   );
