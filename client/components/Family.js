@@ -28,9 +28,37 @@ export default LoginScreen = (props) => {
 
 
   const onRegisterPressed = async (e) => {
+     try{
+      fetch('http://192.168.1.27:5000/login', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json'
+        },
+        body:JSON.stringify(data),
+      })
+      .then((response) => {
+        if(response.status === 200){
+          props.navigation.navigate("My Record");
+        }
+        return response.json()
+      })
+      .then((res) => {
+        if(res.token){
+          console.log('token', res.token);
+          SyncStorage.set('token',res.token)
+        }
+        //setMessage(res.msg||'')
+        console.log(res.msg||'');
+      })
+      .catch(error => console.log(error))
+    }
+    catch(error) {
+      setLoading(false);
+      console.error(error);
+    }
     const data={id,roleRelationShip}
     console.log(data)
-  
+    
   };
 
   return (
