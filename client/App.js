@@ -1,15 +1,14 @@
-import * as React from 'react';
-import { View, Text, Button } from 'react-native';
 import Login from './components/Login';
 import Profile from './components/Fill';
 import Record from './components/MyRecord';
 import Register from './components/Register';
-//import Pending from './components/PedingRequests';
-//import Family from './components/Family';
+import ReceivedRequests from './components/ReceivedRequests';
+import Family from './components/Family';
 import Home from './components/Home';
-//import Received from './components/ReceivedRecord';
-//import Sent from './components/SentRequests';
+import Received from './components/ReceivedRecord';
+import Sent from './components/SentRequests';
 import { NavigationContainer } from '@react-navigation/native';
+
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -37,6 +36,9 @@ function MyDrawer() {
       <Drawer.Screen name="Home" component={Home} />
       <Drawer.Screen name="Edit Profile" component={Profile} />
       <Drawer.Screen name="My Record" component={Record} />
+      <Drawer.Screen name="Received Requests" component={ReceivedRequests} />
+      <Drawer.Screen name="Received Records" component={Received} />
+      <Drawer.Screen name="Sent Requests" component={Sent} />
     </Drawer.Navigator>
   );
 }
@@ -53,6 +55,7 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="Family" component={Family} />
          <Stack.Screen
         
           name="Edit Profile"
@@ -75,7 +78,7 @@ export default function App() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Pending Requests"
+          name="Received Requests"
           component={MyDrawer}
           options={{ headerShown: false }}
         />

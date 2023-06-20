@@ -22,14 +22,17 @@ export default LoginScreen = (props, { navigation }) => {
   <View>
 
      <Text style={styles.txt}>Account</Text>
-           <TouchableOpacity onPress={() => props.navigation.navigate('Login')}>
+           <TouchableOpacity onPress={() => props.navigation.navigate('Edit Profile')}>
            <Custom screenName="Edit Profile"/>
+         </TouchableOpacity>
+          <TouchableOpacity onPress={() => props.navigation.navigate('Login')}>
+           <Custom screenName="Log Out"/>
          </TouchableOpacity>
   <Text style={styles.txt}>List of requests</Text>
            <TouchableOpacity onPress={() => props.navigation.navigate('Sent Requests')}>
            <Custom screenName="Sent Requests"/>
          </TouchableOpacity>
-       <TouchableOpacity onPress={() => props.navigation.navigate('Pending Requests')}>
+       <TouchableOpacity onPress={() => props.navigation.navigate('Received Requests')}>
            <Custom screenName="Received Requests"/>
          </TouchableOpacity>
     <Text style={styles.txt}>Family</Text>

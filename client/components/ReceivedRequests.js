@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,22 +8,23 @@ import {
 } from 'react-native';
 
 import { SwipeListView } from 'react-native-swipe-list-view';
-
+let dt = [
+  { id: '2', filename: 'file1' },
+  { id: '123', filename: 'file2' },
+];
 export default function Basic() {
-  let dt=[{id:'2',filename:"file1",status:"Accepted"},{id:"123",filename:"file2",status:"Rejected"},{id:"134",filename:"file3",status:"Waitting"}]
-  let a=dt.length;
-    const [listData, setListData] = useState(
-        Array(a)
-            .fill('')
-            .map((_, i) => ({ key: `${i}`, id: dt[i].id, filename: dt[i].filename,status:dt[i].status}))
-    );
+  let a = dt.length;
+  const [listData, setListData] = useState(
+    Array(a)
+      .fill('')
+      .map((_, i) => ({ key: `${i}`, id: dt[i].id, filename: dt[i].filename }))
+  );
 
   const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
       rowMap[rowKey].closeRow();
     }
   };
-
 
   const deleteRow = (rowMap, rowKey) => {
     closeRow(rowMap, rowKey);
@@ -43,30 +44,63 @@ export default function Basic() {
       style={styles.rowFront}
       underlayColor={'#AAA'}>
       <View>
-        <Text style={styles.txt}>Receiver ID: {data.item.id}</Text>
+        <Text style={styles.txt}>Sender ID: {data.item.id}</Text>
         <Text style={styles.txt}>File name: {data.item.filename}</Text>
-      {data.item.status=='Accepted'  ? (
-          <Text style={styles.accepted}>[{data.item.status}]</Text>
-        ) : null}
-        {data.item.status == 'Rejected' ? (
-          <Text style={styles.rejected}>[{data.item.status}]</Text>
-        ) : null}
-        {data.item.status == 'Waitting' ? (
-          <Text style={styles.waitting}>[{data.item.status}]</Text>
-        ) : null}
       </View>
     </TouchableHighlight>
   );
+  const downloadFromAPI = async (data, rowMap) => {
+    console.log('ID at now is', data.item.id);
+    const localhost = Platform.OS === 'android' ? '10.0.2.2' : '127.0.0.1';
+    const result = await FileSystem.downloadAsync(
+      ` `, //fetch
+      FileSystem.documentDirectory + filename,
+      {
+        headers: {
+          MyHeader: 'MyValue',
+        },
+      }
+    );
+    console.log(result);
+    save(result.uri, filename, result.headers['Content-Type']);
+    closeRow(rowMap, data.item.key);
+  };
 
+  const save = async (uri, filename, mimetype) => {
+    if (Platform.OS === 'android') {
+      const permissions =
+        await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+      if (permissions.granted) {
+        const base64 = await FileSystem.readAsStringAsync(uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        await FileSystem.StorageAccessFramework.createFileAsync(
+          permissions.directoryUri,
+          filename,
+          mimetype
+        )
+          .then(async (uri) => {
+            await FileSystem.writeAsStringAsync(uri, base64, {
+              encoding: FileSystem.EncodingType.Base64,
+            });
+          })
+          .catch((e) => console.log(e));
+      } else {
+        shareAsync(uri);
+      }
+    } else {
+      shareAsync(uri);
+    }
+  };
   const renderHiddenItem = (data, rowMap) => (
     <View style={styles.rowBack}>
       <TouchableOpacity
-        style={[styles.backRightBtn, styles.backRightBtnRight]}
-        onPress={() => closeRow(rowMap, data.item.key)}>
-        <Text style={styles.backTextWhite}>Close</Text>
+        style={[styles.backRightBtn, styles.backRightBtnLeft]}
+        onPress={() => downloadFromAPI(data,rowMap)}>
+        <Text style={styles.backTextWhite}>Download</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        style={[styles.backRightBtn, styles.backRightBtnLeft]}
+        style={[styles.backRightBtn, styles.backRightBtnRight]}
         onPress={() => deleteRow(rowMap, data.item.key)}>
         <Text style={styles.backTextWhite}>Delete</Text>
       </TouchableOpacity>
@@ -110,19 +144,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 100,
   },
-  accepted: {
-    color: '#03C03C',
-    fontWeight: 'bold',
-  },
-  waitting: {
-    color: '#FFC300',
-    fontWeight: 'bold',
-  },
-  rejected: {
-    color: '#FF4433',
-    fontWeight: 'bold',
-  },
-
   rowBack: {
     alignItems: 'center',
 
@@ -141,12 +162,11 @@ const styles = StyleSheet.create({
     width: 75,
   },
   backRightBtnLeft: {
-    backgroundColor: 'red',
+    backgroundColor: '#0039a6',
     right: 75,
   },
   backRightBtnRight: {
-    backgroundColor: '#0039a6',
-
+    backgroundColor: 'red',
     right: 0,
   },
 });
