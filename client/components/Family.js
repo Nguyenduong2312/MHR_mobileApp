@@ -22,8 +22,8 @@ export default LoginScreen = (props) => {
   const [relation, setRelation] = useState([
     { label: 'Father', value: 'father' },
     { label: 'Mother', value: 'mother' },
-    { label: 'Daughter', value: 'daughter' },
-   { label: 'Son', value: 'son' },
+    { label: 'Child', value: 'child' },
+
   ]);
 
 
@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
 
 button:{
  flex: 1,
+  marginTop:100,
  marginBottom:20,
         backgroundColor: 'white',
         paddingHorizontal: 22,
