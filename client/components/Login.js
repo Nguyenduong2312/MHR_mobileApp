@@ -51,6 +51,7 @@ export default LoginScreen = (props,{navigation}) => {
       setLoading(false);
       console.error(error);
     }*/
+    console.log(data);
     props.navigation.navigate('Home');
  
   };
@@ -88,9 +89,10 @@ export default LoginScreen = (props,{navigation}) => {
           name="privateKey"
           control={control}
           placeholder="Private Key"   placeholderTextColor="#8b9cb5"
-
+          secureTextEntry
           rules={{
-            required: 'PrivateKey is required',
+            required: 'Password is required',
+     
           }}
         />
         <CustomButton
