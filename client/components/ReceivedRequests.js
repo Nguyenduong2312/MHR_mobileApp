@@ -13,6 +13,37 @@ let dt = [
   { id: '123', filename: 'file2' },
 ];
 export default function Basic() {
+
+  const [requestList, setRequestList] = useState();
+
+  console.log('my request: ',SyncStorage.get('token'));
+
+  useEffect(() => {
+    fetch(`http://192.168.1.9:5000/account/user`, {
+        credentials: 'include',
+        method: 'GET',
+        headers: {
+            authorization: `Bearer ${SyncStorage.get('token')}`,
+        },
+    })
+        .then((res) => res.json())
+        .then((account) => {
+          console.log('acc', account);
+            console.log('id:', account.id);
+            fetch(`http://192.168.1.9:5000/requestRecord/receiver/${account.id}`, {
+                headers: {
+                    authorization: `Bearer ${SyncStorage.get('token')}`,
+                },
+            })
+                .then((res) => res.json())
+                .then((request) => {
+                  console.log('request ', request);
+                  setRequestList(records);
+                },[]);
+        });
+    }, []);
+
+
   let a = dt.length;
   const [listData, setListData] = useState(
     Array(a)
@@ -110,7 +141,7 @@ export default function Basic() {
   return (
     <View style={styles.container}>
       <SwipeListView
-        data={listData}
+        data={requestList}
         renderItem={renderItem}
         renderHiddenItem={renderHiddenItem}
         leftOpenValue={75}

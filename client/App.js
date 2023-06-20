@@ -3,7 +3,7 @@ import Profile from './components/Fill';
 import Record from './components/MyRecord';
 import Register from './components/Register';
 import ReceivedRequests from './components/ReceivedRequests';
-import Family from './components/Family';
+//import Family from './components/Family';
 import Home from './components/Home';
 import Received from './components/ReceivedRecord';
 import Sent from './components/SentRequests';
@@ -55,7 +55,7 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen name="Family" component={Family} />
+        <Stack.Screen name="Family" component={Profile} />
          <Stack.Screen
         
           name="Edit Profile"

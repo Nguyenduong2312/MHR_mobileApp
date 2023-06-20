@@ -17,15 +17,15 @@ export default function SignUpScreen(props) {
     data.role='patient'
     console.log(data);
     props.navigation.navigate('Profile');
-     await fetch(`http://${process.env.localhost}:5000/account/register`, {
+    fetch(`http://192.168.1.9:5000/account/signup`, {
       method: 'POST',
       headers: {
-       'Content-Type': 'application/json'
-     },
-     body:JSON.stringify(data),
-        
+      'Content-Type': 'application/json'
+      },
+      body:JSON.stringify(data),
     })
-    .then((response) => {
+  .then((response) => {
+    console.log('response.status', response.status);
       if(response.status === 200){
         props.navigation.navigate('Edit Profile');
       }
@@ -33,9 +33,9 @@ export default function SignUpScreen(props) {
     })
     .then((res) => {
       //setMessage(res.msg||'')
-      console.log(res.msg);
-       alert ('There was a problem with the server');
-       return;
+      console.log('res.msg',res.msg);
+      alert ('There was a problem with the server');
+      return;
     })
     .catch(error => console.log(error))
   };

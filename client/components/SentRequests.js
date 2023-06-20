@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,10 +6,43 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
+import SyncStorage from 'sync-storage';
 
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 export default function Basic() {
+  const [requestList, setRequestList] = useState();
+
+  console.log('my request: ',SyncStorage.get('token'));
+
+  useEffect(() => {
+    fetch(`http://192.168.1.9:5000/account/user`, {
+        credentials: 'include',
+        method: 'GET',
+        headers: {
+            authorization: `Bearer ${SyncStorage.get('token')}`,
+        },
+    })
+        .then((res) => res.json())
+        .then((account) => {
+          console.log('acc', account);
+            console.log('id:', account.id);
+            fetch(`http://192.168.1.9:5000/requestRecord/receiver/${account.id}`, {
+                headers: {
+                    authorization: `Bearer ${SyncStorage.get('token')}`,
+                },
+            })
+                .then((res) => res.json())
+                .then((request) => {
+                  console.log('request ', request);
+                  setRequestList(records);
+                },[]);
+        });
+    }, []);
+
+
+
+
   let dt=[{id:'2',filename:"file1",status:"Accepted"},{id:"123",filename:"file2",status:"Rejected"},{id:"134",filename:"file3",status:"Waitting"}]
   let a=dt.length;
     const [listData, setListData] = useState(
@@ -76,7 +109,7 @@ export default function Basic() {
   return (
     <View style={styles.container}>
       <SwipeListView
-        data={listData}
+        data={requestList}
         renderItem={renderItem}
         renderHiddenItem={renderHiddenItem}
         leftOpenValue={75}
