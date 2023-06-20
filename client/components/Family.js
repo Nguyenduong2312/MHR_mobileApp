@@ -28,6 +28,7 @@ export default LoginScreen = (props) => {
 
 
   const onRegisterPressed = async (e) => {
+     const data={id,roleRelationShip}
      try{
       fetch('http://192.168.1.27:5000/login', {
         method: 'POST',
@@ -56,7 +57,7 @@ export default LoginScreen = (props) => {
       setLoading(false);
       console.error(error);
     }
-    const data={id,roleRelationShip}
+   
     console.log(data)
     
   };
