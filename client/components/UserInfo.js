@@ -13,7 +13,7 @@ export default UserPro = (props) => {
    const acceptstatus= props.route.params.acceptstatus;
   const user={name:"ahihi",address:"fdkjf",email:"hd@",date:"12/12/2016",gender:"male"};
    const viewRecord = () => {
-       props.navigation.navigate('User Record',{userid:id});
+       props.navigation.navigate('User Record',{userid:id,requestStatus:false});
    };
    const viewRelation=()=>{
      props.navigation.navigate("User Relationship",{userid:id});
