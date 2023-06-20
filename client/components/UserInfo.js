@@ -1,8 +1,4 @@
-import { useForm } from 'react-hook-form';
-import { useState, useEffect } from 'react';
-import { Controller } from 'react-hook-form';
-import { Alert } from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
+
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import {
@@ -14,6 +10,7 @@ import {
 } from 'react-native';
 export default UserPro = (props) => {
   const id= props.route.params.userid;
+   const acceptstatus= props.route.params.acceptstatus;
   const user={name:"ahihi",address:"fdkjf",email:"hd@",date:"12/12/2016",gender:"male"};
    const viewRecord = () => {
        props.navigation.navigate('User Record',{userid:id});
@@ -76,7 +73,9 @@ export default UserPro = (props) => {
             </View>
           </View>
         </View>
-
+  {acceptstatus=='yes'  ? (
+     
+       
         <View style={styles.centeredView}>
          <TouchableOpacity style={styles.container}>
           <Text
@@ -93,6 +92,7 @@ export default UserPro = (props) => {
           </Text>
         </TouchableOpacity>
         </View>
+   ) : null}
       </ScrollView>
     </SafeAreaProvider>
   );
@@ -143,4 +143,3 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
 });
-
