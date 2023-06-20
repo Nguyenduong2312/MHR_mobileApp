@@ -9,36 +9,21 @@ import {
 
 import { SwipeListView } from 'react-native-swipe-list-view';
 
-export default function RcRequest() {
-    const handleDeleteRequest = async (e) => {
-        e.preventDefault();
-        try {
-            await axios.delete(`/requestRecord/${props.request._id}`, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            props.setLength((prev) => prev - 1);
-        } catch (err) {
-            console.log('lỗi');
-        }
-    };
-  const [listData, setListData] = useState(
-    Array(20)
-      .fill('')
-      .map((_, i) => ({
-        key: `${i}`,
-        text: `item #${i}`,
-        status: 'Accepted',
-        filename: 'ahaha',
-      }))
-  );
+export default function Basic() {
+  let dt=[{id:'2',filename:"file1",status:"Accepted"},{id:"123",filename:"file2",status:"Rejected"},{id:"134",filename:"file3",status:"Waitting"}]
+  let a=dt.length;
+    const [listData, setListData] = useState(
+        Array(a)
+            .fill('')
+            .map((_, i) => ({ key: `${i}`, id: dt[i].id, filename: dt[i].filename,status:dt[i].status}))
+    );
 
   const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
       rowMap[rowKey].closeRow();
     }
   };
+
 
   const deleteRow = (rowMap, rowKey) => {
     closeRow(rowMap, rowKey);
@@ -58,16 +43,16 @@ export default function RcRequest() {
       style={styles.rowFront}
       underlayColor={'#AAA'}>
       <View>
-        <Text style={styles.txt}>Receiver ID: {data.item.text}</Text>
+        <Text style={styles.txt}>Receiver ID: {data.item.id}</Text>
         <Text style={styles.txt}>File name: {data.item.filename}</Text>
-        {data.item.status == 'Accepted' ? (
-          <Text style={styles.accepted}>[{data.item.text}]</Text>
+      {data.item.status=='Accepted'  ? (
+          <Text style={styles.accepted}>[{data.item.status}]</Text>
         ) : null}
-        {data.item.status == 'Rejeacted' ? (
-          <Text style={styles.rejected}>[{data.item.text}]</Text>
+        {data.item.status == 'Rejected' ? (
+          <Text style={styles.rejected}>[{data.item.status}]</Text>
         ) : null}
-        {data.item.text == 'Waitting' ? (
-          <Text style={styles.waitting}>[{data.item.text}]</Text>
+        {data.item.status == 'Waitting' ? (
+          <Text style={styles.waitting}>[{data.item.status}]</Text>
         ) : null}
       </View>
     </TouchableHighlight>
