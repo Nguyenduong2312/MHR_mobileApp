@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,38 +6,25 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-import SyncStorage from 'sync-storage';
 
 import { SwipeListView } from 'react-native-swipe-list-view';
-import * as FileSystem from 'expo-file-system';
-export default function Basic() {
-    ///
-  const [listData, setListData] = useState();
 
-  console.log('my record: ',SyncStorage.get('token'));
+let dt=[{id:'2',filename:"file1"},{id:"123",filename:"file2"}]
 
-  useEffect(() => {
-    fetch('http://192.168.1.27:5000/account/user', {
-        credentials: 'include',
-        method: 'GET',
-        headers: {
-            authorization: `Bearer ${SyncStorage.get('token')}`,
-        },
-    })
-        .then((res) => res.json())
-        .then((account) => {
-            console.log('id:', account.account.id);
-            fetch(`http://192.168.1.27:5000/record/${account.account.id}`, {
-                headers: {
-                    authorization: `Bearer ${SyncStorage.get('token')}`,
-                },
-            })
-                .then((res) => res.json())
-                .then((records) => {
-                    setListData(records);
-                },[]);
-        });
-    }, []);
+export default function Basic(props) {
+  requestedCheck=true;
+
+  if (typeof props.route.params !== 'undefined'){
+    requestedCheck=props.route.params.requestStatus
+  }
+ 
+  let a=dt.length;
+    const [listData, setListData] = useState(
+        Array(a)
+            .fill('')
+            .map((_, i) => ({ key: `${i}`, id: dt[i].id, filename: dt[i].filename}))
+    );
+
 
   const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
@@ -45,22 +32,27 @@ export default function Basic() {
     }
   };
 
+  const onRowDidOpen = (rowKey) => {
+    console.log('This row opened', rowKey);
+    
+  };
   const renderItem = (data) => (
     <TouchableHighlight
+      onPress={() =>   console.log('You touched me')}
       style={styles.rowFront}
       underlayColor={'#AAA'}>
       <View>
-        <Text style={styles.txt}>File name: {data.item.fileName}</Text>
-        <Text style={styles.txt}>ID Uploader: {data.item.idUploader}</Text>
+        <Text style={styles.txt}>File name: {data.item.filename}</Text>
+        <Text style={styles.txt}>ID Uploader: {data.item.id}</Text>
       </View>
     </TouchableHighlight>
   );
-  const downloadFromAPI = async (data,rowMap) => {
-    const filename="download";
-    closeRow(rowMap,data.item.key);
+   const downloadFromAPI = async (data,rowMap) => {
+    console.log("ID at now is",data.item.id);
+ 
     const localhost = Platform.OS === "android" ? "10.0.2.2" : "127.0.0.1";
     const result = await FileSystem.downloadAsync(
-      `http://192.168.1.27:5000/record/download/${data.item._id}`,//fetch
+      ` `,//fetch
       FileSystem.documentDirectory + filename,
       {
         headers: {
@@ -68,7 +60,14 @@ export default function Basic() {
         }
       }
     );
+    console.log(result);
     save(result.uri, filename, result.headers["Content-Type"]);
+       closeRow(rowMap,data.item.key);
+  };
+   const sendRequest = async (data,rowMap) => {
+    console.log("ID at now is",data.item.id);
+       closeRow(rowMap,data.item.key);
+  
   };
 
   const save = async (uri, filename, mimetype) => {
@@ -91,11 +90,19 @@ export default function Basic() {
 
   const renderHiddenItem = (data, rowMap) => (
     <View style={styles.rowBack}>
+     {requestedCheck===true  ? (
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnLeft]}
-        onPress={() => {downloadFromAPI(data,rowMap)}}>
+
+        onPress={() => downloadFromAPI(data,rowMap)}>
         <Text style={styles.backTextWhite}>Download</Text>
       </TouchableOpacity>
+       ) :   <TouchableOpacity
+        style={[styles.backRightBtn, styles.backRightBtnLeft]}
+
+        onPress={() => sendRequest(data,rowMap)}>
+        <Text style={styles.backTextWhite}>Request</Text>
+      </TouchableOpacity>}
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnRight]}
         onPress={() => closeRow(rowMap, data.item.key)}>
@@ -103,6 +110,7 @@ export default function Basic() {
       </TouchableOpacity>
     </View>
   );
+  
 
   return (
     <View style={styles.container}>
@@ -116,6 +124,7 @@ export default function Basic() {
         previewRowKey={'0'}
         previewOpenValue={-40}
         previewOpenDelay={3000}
+        onRowDidOpen={onRowDidOpen}
       />
     </View>
   );
@@ -141,13 +150,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 80,
   },
-    title: {
-    marginTop: 60,
-    marginBottom: 40,
-    textAlign: 'center',
-    fontSize: 35,
-    color: '#0039a6',
-  },
+  
 
   rowBack: {
     alignItems: 'center',
