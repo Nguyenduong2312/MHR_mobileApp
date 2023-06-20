@@ -30,35 +30,7 @@ export default LoginScreen = (props) => {
   const onRegisterPressed = async (e) => {
     const data={id,roleRelationShip}
     console.log(data)
-    /*let date = selectedStartDate;
-    let gender = genderValue;
-    const formData = { name, address, email, date, gender };
-    console.log(formData)
-    if (!formData.name) {
-      alert('Please enter your name');
-      return;
-    }
-    if (!formData.address) {
-      alert('Please enter your address');
-      return;
-    }
-
-
-    e.preventDefault();
-    try {
-      const res = await axios.put(`/myProfile/${user.id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      setMessage(res.data);
-    } catch (err) {
-      if (err.response.status === 500) {
-        setMessage('There was a problem with the server');
-      } else {
-        setMessage(err.response.data.msg);
-      }
-    }*/
+  
   };
 
   return (
