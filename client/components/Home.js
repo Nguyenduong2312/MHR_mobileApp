@@ -39,6 +39,9 @@ export default LoginScreen = (props, { navigation }) => {
            <TouchableOpacity onPress={() => props.navigation.navigate('Family')}>
            <Custom screenName="Add new member"/>
          </TouchableOpacity>
+           <TouchableOpacity onPress={() => props.navigation.navigate('View family member\'s profiles')}>
+           <Custom screenName="View family member's profiles"/>
+         </TouchableOpacity>
            <Text style={styles.txt}>Record</Text>
            <TouchableOpacity onPress={() => props.navigation.navigate('My Record')}>
            <Custom screenName="My Records"/>
