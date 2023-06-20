@@ -7,7 +7,6 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-import UserInfo from "./UserInfo";
 import { SwipeListView } from 'react-native-swipe-list-view';
 import SyncStorage from 'sync-storage';
 

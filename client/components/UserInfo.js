@@ -1,8 +1,4 @@
-import { useForm } from 'react-hook-form';
-import { useState, useEffect } from 'react';
-import { Controller } from 'react-hook-form';
-import { Alert } from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
+
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import SyncStorage from 'sync-storage';
 
@@ -99,7 +95,9 @@ export default UserPro = ({props, route, navigation}) => {
             </View>
           </View>
         </View>
-
+  {acceptstatus=='yes'  ? (
+     
+       
         <View style={styles.centeredView}>
          <TouchableOpacity style={styles.container}>
           <Text
@@ -116,6 +114,7 @@ export default UserPro = ({props, route, navigation}) => {
           </Text>
         </TouchableOpacity>
         </View>
+   ) : null}
       </ScrollView>
     </SafeAreaProvider>
   );
@@ -166,4 +165,3 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
 });
-

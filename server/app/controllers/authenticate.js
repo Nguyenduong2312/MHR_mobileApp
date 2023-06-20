@@ -4,7 +4,7 @@ const User = require('../models/Account');
 
 const protect = asyncHandler(async (req, res, next) => {
     let token;
-
+    console.log('protect');
     if (
         req.headers.authorization &&
         req.headers.authorization.startsWith('Bearer')
@@ -32,10 +32,11 @@ const protect = asyncHandler(async (req, res, next) => {
 });
 
 const checkPatient = asyncHandler(async (req, res, next) => {
-    console.log('checkPatient', req.params.id || req.body.id);
+    console.log('checkPatient', req.params.id || req.user.id);
 
     User.findOne({ id: req.params.id || req.user.id, role: 'Patient' })
         .then((account) => {
+            console.log('acc:',account);
             if (account) {
                 next();
             } else {
@@ -48,3 +49,4 @@ const checkPatient = asyncHandler(async (req, res, next) => {
 });
 
 module.exports = { protect, checkPatient };
+

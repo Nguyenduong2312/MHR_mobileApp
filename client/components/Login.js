@@ -52,8 +52,9 @@ export default LoginScreen = (props,{navigation}) => {
     catch(error) {
       setLoading(false);
       console.error(error);
-    };
-    //props.navigation.navigate('Profile');
+    }
+    console.log(data);
+    props.navigation.navigate('Home');
  
   };
   //console.log('rokenS',SyncStorage.get('token'));
@@ -86,7 +87,16 @@ export default LoginScreen = (props,{navigation}) => {
             },
           }}
         />
-      
+       <CustomInput 
+          name="privateKey"
+          control={control}
+          placeholder="Private Key"   placeholderTextColor="#8b9cb5"
+          secureTextEntry
+          rules={{
+            required: 'Password is required',
+     
+          }}
+        />
         <CustomButton
           text="Login"
           onPress={

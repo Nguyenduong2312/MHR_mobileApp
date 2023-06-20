@@ -21,25 +21,29 @@ class MembershipController {
     }
 
     request(req, res) {
+        console.log('request',req.body);
         if (!req.body.id || !req.body.role) {
-            return res.send('Id and role can not be empty');
+            return res.json({msg: 'Id and role can not be empty'});
         }
         Account.findOne({ id: req.body.id }).then((account) => {
             if (
                 !account ||
-                Number(req.body.id) === req.user.id ||
+                req.body.id === req.user.id ||
                 account.role === 'Doctor'
             ) {
-                return res.send('User is not exists or invalid.');
+                
+                console.log('invalid');
+                return res.json({msg: 'User is not exists or invalid.'});
             }
+            console.log('true');
             RelationshipRequest.findOne({
                 senderId: req.user.id,
                 receiverId: req.body.id,
             }).then((request) => {
                 if (request && request.status === 'Waitting') {
-                    return res.send(
+                    return res.json({msg:
                         'Request has already been sent before. Waiting for receiver to accept it.',
-                    );
+                });
                 } else {
                     const request = new RelationshipRequest();
                     request.senderId = req.user.id;
@@ -64,11 +68,11 @@ class MembershipController {
                     } else {
                         request.senderRole = 'Child';
                     }
-
+                    console.log('request', request);
                     request
                         .save()
-                        .then(() => res.send('Send success'))
-                        .catch(() => res.send('Send fail'));
+                        .then(() => res.json({msg: 'Send success'}))
+                        .catch(() => res.json({msg: 'Send fail'}));
                 }
             });
         });

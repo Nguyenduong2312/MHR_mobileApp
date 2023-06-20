@@ -13,6 +13,7 @@ const generateToken = (id) => {
 class LoginController {
     // [POST] /login
     login(req, res, next) {
+        console.log('login');
         console.log('req:', req.body);
         const { username, password } = req.body;
         if (!username) {
@@ -95,6 +96,7 @@ class LoginController {
                 // Create temporary account object to assign value
                 const tmp = new Account();
                 tmp.username = req.body.username;
+                tmp.role = req.body.role;
                 const privateKey = eccrypto.generatePrivate();
                 tmp.privateKey = JSON.stringify(privateKey);
                 tmp.publicKey = JSON.stringify(eccrypto.getPublic(privateKey));
@@ -103,7 +105,7 @@ class LoginController {
                     .lean()
                     .sort({ id: 'desc' })
                     .then((lastAccount) => {
-                        console.log('la: ', lastAccount);
+                        //console.log('la: ', lastAccount);
                         if (lastAccount) {
                             tmp.id = lastAccount.id + 1;
                         } else {
