@@ -9,12 +9,14 @@ import Home from './components/Home';
 import Received from './components/ReceivedRecord';
 import Sent from './components/SentRequests';
 import { NavigationContainer } from '@react-navigation/native';
-import UserInfo from "./components/UserInfo"
-
+import UserInfo from "./components/UserInfo";
+import {LogOut} from "./components/LogOut";
+import RelationshipRequests from "./components/RelationRequests";
 import {
-  createDrawerNavigator,
+    createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItemList,
+  DrawerItem,
 } from '@react-navigation/drawer';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -24,10 +26,10 @@ function CustomDrawerContent(props) {
   return (
     <DrawerContentScrollView {...props}>
       <DrawerItemList {...props} />
+        <DrawerItem label="Log Out" onPress={() => LogOut()} />
     </DrawerContentScrollView>
   );
 }
-
 const Drawer = createDrawerNavigator();
 
 function MyDrawer() {
@@ -42,6 +44,8 @@ function MyDrawer() {
       <Drawer.Screen name="Received Records" component={Received} />
       <Drawer.Screen name="Sent Requests" component={Sent} />
          <Drawer.Screen name="View family member's profiles" component={ViewFam} />
+              <Drawer.Screen name="Add family member" component={Family} />
+                 <Drawer.Screen name="Relationship Requests" component={RelationshipRequests} />
     </Drawer.Navigator>
   );
 }
@@ -49,15 +53,16 @@ function MyDrawer() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="View family member's profiles">
+      <Stack.Navigator initialRouteName='Home'>
         <Stack.Screen
           name="Home"
           component={MyDrawer}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Login" component={Login}         options={{ headerShown: false }} />
         <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="Profile" component={Profile}  />
+        <Stack.Screen name="Log Out" component={LogOut}   />
         <Stack.Screen name="Family" component={Family} />
           <Stack.Screen name="User Info" component={UserInfo} />
             <Stack.Screen name="User Record" component={Record} />
@@ -65,6 +70,12 @@ export default function App() {
          <Stack.Screen
         
           name="Edit Profile"
+          component={MyDrawer}
+          options={{ headerShown: false }}
+        />
+          <Stack.Screen
+        
+          name="Add family member"
           component={MyDrawer}
           options={{ headerShown: false }}
         />
@@ -90,6 +101,12 @@ export default function App() {
         />
             <Stack.Screen
           name=" View family member's profiles"
+          component={MyDrawer}
+          options={{ headerShown: false }}
+        />
+          <Stack.Screen
+        
+          name="Relationship Requests"
           component={MyDrawer}
           options={{ headerShown: false }}
         />
