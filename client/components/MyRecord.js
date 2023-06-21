@@ -33,18 +33,21 @@ export default function Basic({route}) {
     })
         .then((res) => res.json())
         .then((account) => {
-            console.log('id:', account.id);
+            console.log('user id:', account.id);
+            console.log('id:', id);
+
             setUserID(account.id)
             
-            fetch(`http://192.168.1.27:5000/record/${id}`, {
+            fetch(`http://192.168.1.27:5000/record/${id || account.id}`, {
                 headers: {
                     authorization: `Bearer ${SyncStorage.get('token')}`,
                 },
             })
-                .then((res) => res.json())
-                .then((records) => {
-                    setListData(records);
-                },[]);
+            .then((res) => res.json())
+            .then((records) => {
+              console.log('records', records);
+                setListData(records);
+            });
         });
     }, []);
 
@@ -67,10 +70,10 @@ export default function Basic({route}) {
   const downloadFromAPI = async (data,rowMap) => {
     const filename="download";
     closeRow(rowMap,data.item.key);
-    const localhost = Platform.OS === "android" ? "10.0.2.2" : "127.0.0.1";
+    //const localhost = Platform.OS === "android" ? "10.0.2.2" : "127.0.0.1";
     const result = await FileSystem.downloadAsync(
       `http://192.168.1.27:5000/record/download/${data.item._id}`,//fetch
-      FileSystem.documentDirectory + filename,
+      FileSystem.documentDirectory + data.item.nameRecord,
       {
         headers: {
           "MyHeader": "MyValue"

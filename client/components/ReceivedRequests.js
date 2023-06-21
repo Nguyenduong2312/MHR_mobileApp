@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import SyncStorage from 'sync-storage';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import * as FileSystem from 'expo-file-system';
 
 export default function Basic() {
 
@@ -32,11 +33,11 @@ export default function Basic() {
                     authorization: `Bearer ${SyncStorage.get('token')}`,
                 },
             })
-                .then((res) => res.json())
-                .then((request) => {
-                  console.log('request ', request);
-                  setRequestList(request);
-                },[]);
+            .then((res) => res.json())
+            .then((request) => {
+              console.log('request ', request);
+              setRequestList(request);
+            });
         });
     }, []);
 
@@ -70,11 +71,11 @@ export default function Basic() {
     </TouchableHighlight>
   );
   const downloadFromAPI = async (data, rowMap) => {
-    console.log('ID at now is', data.item.id);
+    console.log('ID at now is', data.item._id);
     const localhost = Platform.OS === 'android' ? '10.0.2.2' : '127.0.0.1';
     const result = await FileSystem.downloadAsync(
       ` `, //fetch
-      FileSystem.documentDirectory + filename,
+      FileSystem.documentDirectory + data.item.nameRecord,
       {
         headers: {
           MyHeader: 'MyValue',

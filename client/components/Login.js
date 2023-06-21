@@ -44,7 +44,6 @@ export default LoginScreen = (props,{navigation}) => {
           console.log('token', res.token);
           SyncStorage.set('token',res.token)
         }
-        //setMessage(res.msg||'')
         console.log(res.msg||'');
       })
       .catch(error => console.log(error))
@@ -53,9 +52,6 @@ export default LoginScreen = (props,{navigation}) => {
       setLoading(false);
       console.error(error);
     }
-    console.log(data);
-    props.navigation.navigate('Home');
- 
   };
   //console.log('rokenS',SyncStorage.get('token'));
   return(

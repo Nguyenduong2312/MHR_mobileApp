@@ -23,7 +23,7 @@ export default LoginScreen = (props) => {
   const { control, handleSubmit } = useForm();
   const [user, setUser] = useState("");
   useEffect(() => {
-    fetch('http://192.168.1.9:5000/account/user', {
+    fetch('http://192.168.1.27:5000/account/user', {
         credentials: 'include',
         method: 'GET',
         headers: {
@@ -51,8 +51,8 @@ export default LoginScreen = (props) => {
   const [genderOpen, setGenderOpen] = useState(false);
   const [genderValue, setGenderValue] = useState(user.gender);
   const [gender, setGender] = useState([
-    { label: 'Male', value: 'male' },
-    { label: 'Female', value: 'female' },
+    { label: 'Male', value: 'Male' },
+    { label: 'Female', value: 'Female' },
   ]);
 
   const handleChangeStartDate = (propDate) => {
@@ -66,26 +66,6 @@ export default LoginScreen = (props) => {
     let date = selectedStartDate;
     let gender = genderValue;
     const formData = { name, address, email, date, gender };
-    if (!formData.name) {
-      alert('Please enter your name');
-      return;
-    }
-    if (!formData.address) {
-      alert('Please enter your address');
-      return;
-    }
-    if (!formData.gender) {
-      alert('Please select your gender');
-      return;
-    }
-    if (!formData.email) {
-      alert('Please enter your email');
-      return;
-    }
-    if (!formData.date) {
-      alert('Please select your birthday');
-      return;
-    }     
     try {
       console.log('formData', formData);
       fetch(`http://192.168.1.27:5000/myProfile/${user.id}`, {
@@ -124,7 +104,7 @@ export default LoginScreen = (props) => {
             <Text>Name</Text>
             <View style={styles.input}>
               <TextInput
-                value={name}
+                value={name === ''? ' ' : name || user.name}
                 onChangeText={(value) => setName(value)}
                 editable={true}
               />
@@ -150,7 +130,7 @@ export default LoginScreen = (props) => {
               paddingLeft: 8,
             }}>
             <TextInput
-              value={address}
+                value={address === ''? ' ' : address || user.address}
               onChangeText={(value) => setAddress(value)}
               editable={true}
             />
@@ -175,7 +155,7 @@ export default LoginScreen = (props) => {
             }}>
             <TextInput
               type="email"
-              value={email}
+              value={email === ''? ' ' : email || user.email}
               onChangeText={(value) => setEmail(value)}
               editable={true}
             />
@@ -197,7 +177,7 @@ export default LoginScreen = (props) => {
                   <Text style={{ color: '#8b9cb5', alignItems: 'center' }}>
                     Birthday{' '}
                   </Text>
-                  <Text>{selectedStartDate}</Text>
+                  <Text>{selectedStartDate || user.date}</Text>
                 </TouchableOpacity>
               </View>
 
@@ -241,7 +221,7 @@ export default LoginScreen = (props) => {
               <DropDownPicker
                 style={styles.input}
                 open={genderOpen}
-                value={genderValue}
+                value={genderValue === "Select Gender"? user.gender :  genderValue || user.gender}
                 items={gender}
                 setOpen={setGenderOpen}
                 setValue={setGenderValue}
