@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,17 +8,36 @@ import {
 } from 'react-native';
 
 import { SwipeListView } from 'react-native-swipe-list-view';
-let dt = [
-  { id: '2', filename: 'file1' },
-  { id: '123', filename: 'file2' },
-];
+import SyncStorage from 'sync-storage';
+
 export default function Basic() {
-  let a = dt.length;
-  const [listData, setListData] = useState(
-    Array(a)
-      .fill('')
-      .map((_, i) => ({ key: `${i}`, id: dt[i].id, filename: dt[i].filename }))
-  );
+  const [listData, setListData] = useState();
+
+  console.log('my record: ',SyncStorage.get('token'));
+
+  useEffect(() => {
+    fetch('http://192.168.1.27:5000/account/user', {
+        credentials: 'include',
+        method: 'GET',
+        headers: {
+            authorization: `Bearer ${SyncStorage.get('token')}`,
+        },
+    })
+        .then((res) => res.json())
+        .then((account) => {
+            console.log('id:', account.id);
+            fetch(`http://192.168.1.27:5000/record/received/${account.id}`, {
+                headers: {
+                    authorization: `Bearer ${SyncStorage.get('token')}`,
+                },
+            })
+            .then((res) => res.json())
+            .then((records) => {
+              console.log('records', records);
+              setListData(records);
+            });
+        });
+    }, []);
 
   const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
@@ -44,26 +63,25 @@ export default function Basic() {
       style={styles.rowFront}
       underlayColor={'#AAA'}>
       <View>
-        <Text style={styles.txt}>Sender ID: {data.item.id}</Text>
-        <Text style={styles.txt}>File name: {data.item.filename}</Text>
+        <Text style={styles.txt}>Sender ID: {data.item.idSender}</Text>
+        <Text style={styles.txt}>File name: {data.item.fileName}</Text>
       </View>
     </TouchableHighlight>
   );
-  const downloadFromAPI = async (data, rowMap) => {
-    console.log('ID at now is', data.item.id);
-    const localhost = Platform.OS === 'android' ? '10.0.2.2' : '127.0.0.1';
+  const downloadFromAPI = async (data,rowMap) => {
+    const filename="download";
+    closeRow(rowMap,data.item.key);
+    //const localhost = Platform.OS === "android" ? "10.0.2.2" : "127.0.0.1";
     const result = await FileSystem.downloadAsync(
-      ` `, //fetch
+      `http://192.168.1.27:5000/record/download/${data.item._id}`,//fetch
       FileSystem.documentDirectory + filename,
       {
         headers: {
-          MyHeader: 'MyValue',
-        },
+          "MyHeader": "MyValue"
+        }
       }
     );
-    console.log(result);
-    save(result.uri, filename, result.headers['Content-Type']);
-    closeRow(rowMap, data.item.key);
+    save(result.uri, filename, result.headers["Content-Type"]);
   };
 
   const save = async (uri, filename, mimetype) => {

@@ -17,8 +17,8 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import CustomButton from './CustomButton';
-//import { getFormatedDate } from 'react-native-modern-datepicker';
-//import DatePicker from 'react-native-modern-datepicker';
+import { getFormatedDate } from 'react-native-modern-datepicker';
+import DatePicker from 'react-native-modern-datepicker';
 export default LoginScreen = (props) => {
   const { control, handleSubmit } = useForm();
   const [user, setUser] = useState("");
@@ -41,10 +41,10 @@ export default LoginScreen = (props) => {
   const [email, setEmail] = useState(user.email);
   const [address, setAddress] = useState(user.address);
   const today = new Date();
-  //const startDate = getFormatedDate(
-    //today.setDate(today.getDate() + 1),
-    //'DD-MM-YYYY'
-  //);
+  const startDate = getFormatedDate(
+    today.setDate(today.getDate() + 1),
+    'DD-MM-YYYY'
+  );
   const [openStartDatePicker, setOpenStartDatePicker] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState(user.date);
   const [startedDate, setStartedDate] = useState('');
@@ -62,10 +62,10 @@ export default LoginScreen = (props) => {
     setOpenStartDatePicker(!openStartDatePicker);
   };
   const onRegisterPressed = async (e) => {
+    console.log('update: ', );
     let date = selectedStartDate;
     let gender = genderValue;
     const formData = { name, address, email, date, gender };
-    console.log(formData)
     if (!formData.name) {
       alert('Please enter your name');
       return;
@@ -86,14 +86,14 @@ export default LoginScreen = (props) => {
       alert('Please select your birthday');
       return;
     }     
-
-    e.preventDefault();
     try {
-      const res = await axios.put(`/myProfile/${user.id}`, formData, {
-        
+      console.log('formData', formData);
+      fetch(`http://192.168.1.27:5000/myProfile/${user.id}`, {
+        method: 'PUT',
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json'
         },
+        body: JSON.stringify(formData)
         
 
       });
@@ -180,9 +180,7 @@ export default LoginScreen = (props) => {
               editable={true}
             />
           </View>
-        </View>
-        <Text>Birthday</Text>
-        <Controller
+          <Controller
           name="birthday"
           control={control}
           defaultValue=""
@@ -194,18 +192,46 @@ export default LoginScreen = (props) => {
               }}>
               <View>
                 <TouchableOpacity
-                  style={styles.input}
+                  style={styles.container}
                   onPress={handleOnPressStartDate}>
-                  <Text
-                    style={{ color: '#8b9cb5', alignItems: 'center' }}></Text>
+                  <Text style={{ color: '#8b9cb5', alignItems: 'center' }}>
+                    Birthday{' '}
+                  </Text>
                   <Text>{selectedStartDate}</Text>
                 </TouchableOpacity>
               </View>
 
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={openStartDatePicker}>
+                <View style={styles.centeredView}>
+                  <View style={styles.modalView}>
+                    <DatePicker
+                      mode="calendar"
+                      minimumDate={startDate}
+                      selected={startedDate}
+                      onDateChanged={handleChangeStartDate}
+                      onSelectedChange={(date) => setSelectedStartDate(date)}
+                      options={{
+                        backgroundColor: '#080516',
+                        textHeaderColor: '#469ab6',
+                        textDefaultColor: '#FFFFFF',
+                        selectedTextColor: '#FFF',
+                        mainColor: '#469ab6',
+                        textSecondaryColor: '#FFFFFF',
+                        borderColor: 'rgba(122, 146, 165, 0.1)',
+                      }}
+                    />
+                    <TouchableOpacity onPress={handleOnPressStartDate}>
+                      <Text style={{ color: 'white' }}>Close</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </Modal>
             </KeyboardAvoidingView>
           )}
         />
-        <View>
           <Text style={{ marginTop: 6 }}>Gender</Text>
           <Controller
             name="gender"
@@ -230,7 +256,7 @@ export default LoginScreen = (props) => {
             )}
           />
         </View>
-    
+              
         <View style={styles.centeredView}>
             <CustomButton
           text="Save"
@@ -276,6 +302,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop:50,
   },
   modalView: {
     margin: 20,

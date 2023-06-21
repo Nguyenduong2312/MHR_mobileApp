@@ -12,9 +12,11 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import * as FileSystem from 'expo-file-system';
 export default function Basic({route}) {
     ///
+  const id = route.id;
   const [listData, setListData] = useState();
   requestedCheck = true;
-
+  const [formData, setFormData] = useState({})
+  const [userID,setUserID] = useState();
   if (typeof route.params !== 'undefined'){
     requestedCheck = route.params.isAuth
   }
@@ -32,7 +34,9 @@ export default function Basic({route}) {
         .then((res) => res.json())
         .then((account) => {
             console.log('id:', account.id);
-            fetch(`http://192.168.1.27:5000/record/${account.id}`, {
+            setUserID(account.id)
+            
+            fetch(`http://192.168.1.27:5000/record/${id}`, {
                 headers: {
                     authorization: `Bearer ${SyncStorage.get('token')}`,
                 },
@@ -77,8 +81,40 @@ export default function Basic({route}) {
   };
 
   const sendRequest = async (data,rowMap) => {
-    console.log("ID at now is",data.item.id);
-       closeRow(rowMap,data.item.key);
+    console.log('send request',data.item);
+    const formData = {
+      ['idSender']: userID,
+      ['idReceiver']: data.item.idReceiver,
+      ['idRecord']: data.item._id,
+      ['idOnChain']: data.item.idOnChain,
+      ['nameRecord']: data.item.fileName,
+    }
+    console.log("ID at now is request",formData);
+    try{
+      console.log('daraa: ',formData);
+      fetch('http://192.168.1.27:5000/requestRecord', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${SyncStorage.get('token')}`,
+        },
+        body:JSON.stringify(data),
+      })
+      .then((response) => {
+        return response.json()
+      })
+      .then((res) => {
+        console.log(res.msg||'');
+      })
+      .catch(error => console.log(error))
+    }
+    catch(error) {
+      //setLoading(false);
+      console.error(error);
+    }
+
+    
+    closeRow(rowMap,data.item.key);
   };
 
   const save = async (uri, filename, mimetype) => {

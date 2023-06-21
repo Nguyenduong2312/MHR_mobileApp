@@ -36,10 +36,11 @@ export default UserPro = ({props, route, navigation}) => {
 
 
   const viewRecord = () => {
-    navigation.navigate('User Record', {id: id, isAuth:false });
+    console.log('iddd', user.id);
+    navigation.navigate('User Record', {id: user.id, isAuth:false });
   };
   const viewRelation=()=>{
-    navigation.navigate("User Relationship", {id:id});
+    navigation.navigate("User Relationship", {id : user.id});
   }
 
   return (
