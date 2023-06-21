@@ -6,7 +6,7 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-
+import * as FileSystem from 'expo-file-system';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import SyncStorage from 'sync-storage';
 
@@ -110,6 +110,19 @@ export default function Basic() {
       shareAsync(uri);
     }
   };
+
+  const handleDeleteRecord = async (data,rowMap) => {
+    fetch(`http://192.168.1.27:5000/record/${data.item._id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(res => res.json())
+    .then(res => {console.log(res.msg)})
+    .catch((e) => console.log(e));
+  }
+
   const renderHiddenItem = (data, rowMap) => (
     <View style={styles.rowBack}>
       <TouchableOpacity
@@ -119,7 +132,7 @@ export default function Basic() {
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnRight]}
-        onPress={() => deleteRow(rowMap, data.item.key)}>
+        onPress={() => handleDeleteRecord(data,rowMap)}>
         <Text style={styles.backTextWhite}>Delete</Text>
       </TouchableOpacity>
     </View>

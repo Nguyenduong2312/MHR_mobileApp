@@ -17,31 +17,29 @@ export default function Basic() {
 
   useEffect(() => {
     fetch(`http://192.168.1.27:5000/account/user`, {
-        credentials: 'include',
-        method: 'GET',
-        headers: {
-            authorization: `Bearer ${SyncStorage.get('token')}`,
-        },
+      credentials: 'include',
+      method: 'GET',
+      headers: {
+          authorization: `Bearer ${SyncStorage.get('token')}`,
+      },
     })
-        .then((res) => res.json())
-        .then((account) => {
-          console.log('acc', account);
-            console.log('id:', account.id);
-            fetch(`http://192.168.1.27:5000/requestRecord/receiver/${account.id}`, {
-                headers: {
-                    authorization: `Bearer ${SyncStorage.get('token')}`,
-                },
-            })
-                .then((res) => res.json())
-                .then((request) => {
-                  console.log('request ', request);
-                  setRequestList(request);
-                  setLength(request.length);
-                });
-        });
-    }, [length]);
-    console.log('requestList', requestList);
-
+    .then((res) => res.json())
+    .then((account) => {
+      console.log('account.id:', account.id);
+      fetch(`http://192.168.1.27:5000/requestRecord/sender/${account.id}`, {
+          headers: {
+              authorization: `Bearer ${SyncStorage.get('token')}`,
+          },
+      })
+      .then((res) => res.json())
+      .then((request) => {
+        console.log('request ', request);
+        setRequestList(request);
+        setLength(request.length);
+      });
+    });
+  }, []);
+  
   const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
       rowMap[rowKey].closeRow();
@@ -70,12 +68,12 @@ export default function Basic() {
         <Text style={styles.txt}>Receiver ID: {data.item.idReceiver}</Text>
         <Text style={styles.txt}>File name: {data.item.nameRecord}</Text>
       {data.item.status=='Accepted'  ? (
-          <Text style={styles.accepted}>[{data.item.status}]</Text>
+          <Text style={styles.accepted}>{data.item.status}</Text>
         ) : null}
         {data.item.status == 'Rejected' ? (
-          <Text style={styles.rejected}>[{data.item.status}]</Text>
+          <Text style={styles.rejected}>{data.item.status}</Text>
         ) : null}
-        {data.item.status == 'Waitting' ? (
+        {data.item.status == 'Waiting' ? (
           <Text style={styles.waitting}>[{data.item.status}]</Text>
         ) : null}
       </View>
@@ -99,28 +97,17 @@ export default function Basic() {
 
   const handleDelete = async (data,rowMap) => {
     console.log("ID at now is",data.item._id);
-    try {
-      fetch(`http://192.168.1.27:5000/requestRecord/${data.item._id}`, {
+    fetch(`http://192.168.1.27:5000/requestRecord/${data.item._id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data.item)
-      })
-      .then(res => res.json())
-      .then(res => {
-        if(res.status === true){
-          console.log('xóa thành công');
-          setLength(requestList.length);
-        }
-        else{
-          console.log('fail');
-        }
-      })
-      //props.setLengthOfRequestList((prev) => prev - 1);
-  } catch (err) {
-      console.log('lỗi');
-  }
+    })
+    .then(res => res.json())
+    .then(res => {
+      console.log(res.msg);
+    })
+    .catch(error => console.log(error))
   };
 
   return (

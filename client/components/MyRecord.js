@@ -13,10 +13,10 @@ import * as FileSystem from 'expo-file-system';
 export default function Basic({route}) {
     ///
   const id = route.id;
+  console.log('route', route);
   const [listData, setListData] = useState();
   requestedCheck = true;
-  const [formData, setFormData] = useState({})
-  const [userID,setUserID] = useState();
+  const [userID,setUserID] = useState('');
   if (typeof route.params !== 'undefined'){
     requestedCheck = route.params.isAuth
   }
@@ -37,7 +37,7 @@ export default function Basic({route}) {
             console.log('id:', id);
 
             setUserID(account.id)
-            
+            console.log('sda' , id || account.id);
             fetch(`http://192.168.1.27:5000/record/${id || account.id}`, {
                 headers: {
                     authorization: `Bearer ${SyncStorage.get('token')}`,
@@ -47,8 +47,10 @@ export default function Basic({route}) {
             .then((records) => {
               console.log('records', records);
                 setListData(records);
-            });
-        });
+            })
+            .catch(error => console.log(error))
+        })
+        .catch(error => console.log(error));
     }, []);
 
   const closeRow = (rowMap, rowKey) => {
@@ -86,22 +88,20 @@ export default function Basic({route}) {
   const sendRequest = async (data,rowMap) => {
     console.log('send request',data.item);
     const formData = {
-      ['idSender']: userID,
+      ['idSender']: userID.toString(),
       ['idReceiver']: data.item.idReceiver,
       ['idRecord']: data.item._id,
       ['idOnChain']: data.item.idOnChain,
       ['nameRecord']: data.item.fileName,
     }
-    console.log("ID at now is request",formData);
-    try{
-      console.log('daraa: ',formData);
+    console.log('formData: ',formData);
       fetch('http://192.168.1.27:5000/requestRecord', {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
         authorization: `Bearer ${SyncStorage.get('token')}`,
         },
-        body:JSON.stringify(data),
+        body:JSON.stringify(formData),
       })
       .then((response) => {
         return response.json()
@@ -110,11 +110,6 @@ export default function Basic({route}) {
         console.log(res.msg||'');
       })
       .catch(error => console.log(error))
-    }
-    catch(error) {
-      //setLoading(false);
-      console.error(error);
-    }
 
     
     closeRow(rowMap,data.item.key);

@@ -59,6 +59,55 @@ export default function Basic() {
     console.log('This row opened', rowKey);
   };
 
+  const handleAccept = async (data,rowMap) => {
+    console.log("ID at now is",data.item._id);
+    try {
+      fetch(`http://192.168.1.27:5000/requestRecord/${data.item._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          idSender: data.item.idSender,
+          status: 'Accepted',})
+      })
+      //.then(res => res.json())
+      //.then(res => {console.log(res);})
+      //props.setLengthOfRequestList((prev) => prev - 1);
+    } catch (err) {
+        console.log('lỗi');
+    }
+      //deleteRow(rowMap, data.item.key)
+    };
+
+
+  const handleReject = async (data,rowMap) => {
+    console.log("ID at now is",data.item._id);
+    try {
+      fetch(`http://192.168.1.27:5000/requestRecord/${data.item._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          idSender: data.item.idSender,
+          status: 'Rejected',})
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.status === true){
+          console.log('xóa thành công');
+        }
+        else{
+          console.log('fail');
+        }
+      })
+      //props.setLengthOfRequestList((prev) => prev - 1);
+  } catch (err) {
+      console.log('lỗi');
+  }
+  };
+
   const renderItem = (data) => (
     <TouchableHighlight
       onPress={() => console.log('You touched me')}
@@ -70,60 +119,18 @@ export default function Basic() {
       </View>
     </TouchableHighlight>
   );
-  const downloadFromAPI = async (data, rowMap) => {
-    console.log('ID at now is', data.item._id);
-    const localhost = Platform.OS === 'android' ? '10.0.2.2' : '127.0.0.1';
-    const result = await FileSystem.downloadAsync(
-      ` `, //fetch
-      FileSystem.documentDirectory + data.item.nameRecord,
-      {
-        headers: {
-          MyHeader: 'MyValue',
-        },
-      }
-    );
-    console.log(result);
-    save(result.uri, filename, result.headers['Content-Type']);
-    closeRow(rowMap, data.item.key);
-  };
 
-  const save = async (uri, filename, mimetype) => {
-    if (Platform.OS === 'android') {
-      const permissions =
-        await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-      if (permissions.granted) {
-        const base64 = await FileSystem.readAsStringAsync(uri, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-        await FileSystem.StorageAccessFramework.createFileAsync(
-          permissions.directoryUri,
-          filename,
-          mimetype
-        )
-          .then(async (uri) => {
-            await FileSystem.writeAsStringAsync(uri, base64, {
-              encoding: FileSystem.EncodingType.Base64,
-            });
-          })
-          .catch((e) => console.log(e));
-      } else {
-        shareAsync(uri);
-      }
-    } else {
-      shareAsync(uri);
-    }
-  };
   const renderHiddenItem = (data, rowMap) => (
     <View style={styles.rowBack}>
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnLeft]}
-        onPress={() => downloadFromAPI(data,rowMap)}>
-        <Text style={styles.backTextWhite}>Download</Text>
+        onPress={() => handleAccept(data,rowMap)}>
+        <Text style={styles.backTextWhite}>Accept</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnRight]}
-        onPress={() => deleteRow(rowMap, data.item.key)}>
-        <Text style={styles.backTextWhite}>Delete</Text>
+        onPress={() => handleReject(data,rowMap)}>
+        <Text style={styles.backTextWhite}>Reject</Text>
       </TouchableOpacity>
     </View>
   );

@@ -95,17 +95,17 @@ class MembershipController {
         ); // add for sender
 
         RelationshipRequest.findOneAndRemove({ _id: req.params.id })
-            .then(() => res.json({ status: true }))
-            .catch(() => res.json({ status: false }));
+            .then(() => res.json({ msg: 'Accepted' }))
+            .catch(() => res.json({ msg: 'Err' }));
 
-        res.status(200);
+        
     }
 
     deleteRequest(req, res) {
         console.log('delete');
         RelationshipRequest.findOneAndRemove({ _id: req.params.id })
-            .then(() => res.json({ status: true }))
-            .catch(() => res.json({ status: false }));
+            .then(() => res.json({ msg: 'Rejected' }))
+            .catch(() => res.json({ msg: 'Err' }));
     }
 }
 

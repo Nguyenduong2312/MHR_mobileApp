@@ -16,12 +16,11 @@ export default function Basic({props,route,navigation}) {
   const [childList, setChildList] = useState([]);
   const [parentList, setParentList] = useState([]);
   let { id } = route.params || '';
-
+  
   useEffect(() => {
     setParentList([]);
     setChildList([]);
-    console.log('fet',id || 'user');
-    fetch(`http://192.168.1.27:5000/account/${id || 'user'}`, {
+    fetch(`http://192.168.1.27:5000/account/${id? 'id/' + id : 'user'}`, {
         credentials: 'include',
         method: 'GET',
         headers: {
@@ -30,9 +29,6 @@ export default function Basic({props,route,navigation}) {
     })
         .then((res) => res.json())
         .then((account) => {
-          console.log('acc', account);
-          console.log('id:', account.id);
-          console.log('relation: ', account.relationship);
           const accRelationship = account.relationship;
           for (let key in accRelationship) {
               fetch(`http://192.168.1.27:5000/account/id/${key}`, {
@@ -42,7 +38,6 @@ export default function Basic({props,route,navigation}) {
               .then((res) => res.json())
               .then((user) => {
                 var tmp = user;
-                console.log('user', user);
                 tmp.roleRelationShip = accRelationship[key];
                 if (accRelationship[key] !== 'Child') {
                     setParentList((oldArray) => [...oldArray, tmp]);

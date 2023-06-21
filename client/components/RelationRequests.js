@@ -99,8 +99,9 @@ export default function Basic({navigation}) {
         },
         body: JSON.stringify(data.item)
       })
-      //.then(res => res.json())
-      //.then(res => {console.log(res);})
+      .then(res => res.json())
+      .then(res => {console.log(res.msg)})
+      .catch(error => console.log(error))
       //props.setLengthOfRequestList((prev) => prev - 1);
   } catch (err) {
       console.log('lỗi');
@@ -119,14 +120,8 @@ export default function Basic({navigation}) {
         body: JSON.stringify(data.item)
       })
       .then(res => res.json())
-      .then(res => {
-        if(res.status === true){
-          console.log('xóa thành công');
-        }
-        else{
-          console.log('fail');
-        }
-      })
+      .then(res => {console.log(res.msg);})
+      .catch(error => console.log(error));
       //props.setLengthOfRequestList((prev) => prev - 1);
   } catch (err) {
       console.log('lỗi');
